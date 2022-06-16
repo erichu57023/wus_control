@@ -1,0 +1,42 @@
+###### POWER OPTIONS ########
+
+// the chip-select pin for the AD9833
+CS_AD9833 13
+
+// the chip-select pin for the TUSS4470
+CS_TUSS4470 12
+
+// the pin that controls bursting of the TUSS4470
+CS_BURST_CONTROL 2
+
+// regulated mode, turns on TUSS4470 internal voltage regulator (ON/OFF)
+REGULATED_MODE ON
+
+// pre-driver mode, use only if driving external transistors with the TUSS4470 (ON/OFF)
+PRE_DRIVER_MODE ON
+
+// output voltage (only matters if internal regulator is on) (minimum 5, maximum 21)
+VOLTAGE 10
+
+// current mode, used to charge the capacitor if using regulated mode (LOW/HIGH)
+CURRENT_MODE HIGH
+
+// IO mode, check TUSS4470 datasheet for more info (MODE0/MODE1/MODE2/MODE3)
+IO_MODE MODE1
+
+###### BURST OPTIONS ########
+
+// fundamental frequency in Hz
+FREQUENCY 450000
+
+// maximum duration of burst stimulation in seconds
+TIMEOUT 1
+
+// burst period in milliseconds
+BURST_PERIOD 10
+
+// number of pulses per burst; continuous if set to 0; maximum of 63
+PULSE_COUNT 20
+
+// burst duty cycle percentage, ONLY matters if PULSE_COUNT = 0
+DUTY_CYCLE 50
