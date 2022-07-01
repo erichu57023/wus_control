@@ -37,7 +37,7 @@ class InterruptState(State):
         elif command[0] == 'off':
             controller.go_to_state('idle')
         elif command[0] == 'settings':
-            print('Settings: ' + str(controller.settings))
+            controller.print('Settings: ' + str(controller.settings))
             controller.go_to_state('idle')
         else:
             if command[0] not in mutable_settings:

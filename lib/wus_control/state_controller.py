@@ -35,6 +35,11 @@ class StateController(object):
         if self.state:
             self.state.update(self)
 
+    def print(self, message):
+        print(message)
+        format_message = message.strip() + '\n'
+        self.uart.write(format_message.encode('utf-8'))
+
     def _load_settings(self, settings_file):
         with open(settings_file, encoding='utf-8') as f:
             for line in f:
@@ -51,5 +56,3 @@ class StateController(object):
                     else:                               # Parse setting values based on datatype
                         setting[1] = valid_settings[setting[0]](setting[1])
                     self.settings[setting[0]] = setting[1]
-        
-        # print('Settings: ' + str(self.settings))
