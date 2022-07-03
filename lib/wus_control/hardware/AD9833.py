@@ -27,7 +27,7 @@ class AD9833(object):
 
     def set_type(self, inter):
         if inter == 1:
-            self.shape_word = 0x2020
+            self.shape_word = 0x2028
         elif inter == 2:
             self.shape_word = 0x2002
         else:
@@ -35,7 +35,7 @@ class AD9833(object):
 
     @property
     def shape_type(self):
-        if self.shape_word == 0x2020:
+        if self.shape_word == 0x2028:
             return "Square"
         elif self.shape_word == 0x2002:
             return "Triangle"
@@ -44,11 +44,11 @@ class AD9833(object):
 
     def send(self):
         # Calculate frequency word to send
-        word = hex(int(round((self._freq*2**28)/self.ClockFreq)))
+        word = round((self._freq * (2**28)) / self.ClockFreq)
 
         # Split frequency word onto its seperate bytes
-        MSB = (int(word, 16) & 0xFFFC000) >> 14
-        LSB = int(word, 16) & 0x3FFF
+        MSB = (word & 0xFFFC000) >> 14 
+        LSB = (word & 0x3FFF)
 
         # Set control bits DB15 = 0 and DB14 = 1; for frequency register 0
         MSB |= 0x4000
