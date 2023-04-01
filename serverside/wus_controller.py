@@ -84,9 +84,12 @@ class WUS_Controller:
         try:
             start_time = monotonic_ns()
             while monotonic_ns() - start_time < timeout_ns:
-                self._burst_on()
+                self._burst_on();
                 self.wait(refresh_interval)
+                #exp._burst_on() # this give error 
+                #exp.wait(refresh_interval)
             self._burst_off()
+            #exp._burst_off()
         except KeyboardInterrupt:
             raise
 
@@ -123,16 +126,16 @@ if __name__ == '__main__':
         exp = WUS_Controller()
         exp.connect()
         exp.set('pulse_count', 0)
-        exp.set('frequency', 440000)
-        exp.set('timeout', 30)
+        exp.set('frequency', 450000)
+        exp.set('timeout',10)
         exp.check_setting('frequency')
         exp.check_setting('timeout')
 
         while True:
             if not exp.check_connection():
                 break;
-            exp.hold_on(4)
-            exp.wait(1)
+            exp.hold_on(1)
+            exp.wait(2)
 
     except KeyboardInterrupt:
         print('CTRL-C detected')

@@ -1,10 +1,13 @@
 ###### POWER OPTIONS ########
 
-// the chip-select pin for the AD9833
-CS_AD9833 13
+// the pin where baseline frequency is output
+PWM_WAVE_GEN 11
 
 // the chip-select pin for the TUSS4470
 CS_TUSS4470 12
+
+// the chip-select pin for the AD9833
+CS_AD9833 13
 
 // the pin that controls bursting of the TUSS4470
 CS_BURST_CONTROL 2
@@ -39,4 +42,4 @@ BURST_PERIOD 10
 PULSE_COUNT 20
 
 // burst duty cycle percentage, ONLY matters if PULSE_COUNT = 0
-DUTY_CYCLE 50
+DUTY_CYCLE 20
