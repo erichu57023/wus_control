@@ -5,10 +5,8 @@
 
 #include "TUSS4470.h"
 
-/*
-   Create a TUSS4470 object
-*/
-TUSS4470 :: TUSS4470(uint8_t CSpin, bool pre_driver) {
+// Create a TUSS4470 object
+TUSS4470 :: TUSS4470(uint8_t CSpin) {
   // Chip select pin to enable SPI (active low)
   pinMode(CSpin, OUTPUT);
   digitalWrite(CSpin, HIGH);
@@ -19,16 +17,12 @@ TUSS4470 :: TUSS4470(uint8_t CSpin, bool pre_driver) {
   _drvHiZ = HIZ_ON;
   _pulseCount = 0;
   _ioMode = IO_MODE0;
-  _preDriver = pre_driver;
+  _preDriver = PRE_DRV0;
 }
-
 
 // ----------------------------- General functions ----------------------------- //
 
-void TUSS4470 :: begin() {
-//  SPI.begin();
-  delay(100);
-}
+void TUSS4470 :: begin() {}
 
 void TUSS4470 :: reset() {
   for (int i = 0; i < 10; i++) {
@@ -52,12 +46,12 @@ void TUSS4470 :: enableRegulation() {
 }
 
 void TUSS4470 :: disablePreDriver() {
-  _preDriver = false;
+  _preDriver = PRE_DRV0;
   updateBurstPulseRegister();
 }
 
 void TUSS4470 :: enablePreDriver() {
-  _preDriver = true;
+  _preDriver = PRE_DRV1;
   updateBurstPulseRegister();
 }
 

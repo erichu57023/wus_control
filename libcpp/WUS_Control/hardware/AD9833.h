@@ -21,9 +21,8 @@
  * 
  */
 
-#ifndef __AD9833__
-
-#define __AD9833__
+#ifndef AD9833_H
+#define AD9833_H
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -136,4 +135,3 @@ private:
 };
 
 #endif
-
