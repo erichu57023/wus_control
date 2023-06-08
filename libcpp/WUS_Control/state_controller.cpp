@@ -1,47 +1,44 @@
 #include "state_controller.h"
 
-StateController :: StateController()
-        : devStatus(DEVICE_OK) {
+StateController :: StateController(void) {
     load_settings();
     setup_rgbLED();
 }
 
-void StateController :: add_state(State* state) {
-    stateList[state->name] = state;
+void StateController :: add_state(State& state) {
+    stateList[state.get_name()] = &state;
 }
- 
+
 void StateController :: go_to_state(stateName name) {
-    if (currentState->name != NULL_STATE) {
-        previousState = currentState->name;
-        currentState->exit();
+    if (currentState != NULL_STATE) {
+        previousState = stateList[currentState]->get_name();
+        stateList[currentState]->exit();
     }
-    currentState = stateList[name];
-    currentState->enter();
+    currentState = name;
+    stateList[currentState]->enter();
 }
 
-void StateController :: update() {
-    currentState->update();
+void StateController :: update(void) {
+    stateList[currentState]->update();
 }
 
-void StateController :: set_rgbLED(int rVal, int gVal, int bVal) {
-    rgbLED->setPixelColor(0, rVal, gVal, bVal);
-    rgbLED->show();
+void StateController :: set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal) {
+    strip->setPixelColor(0, rVal, gVal, bVal);
+    strip->show();
 }
 
-bool StateController :: is_connected() {
+bool StateController :: is_connected(void) {
     return Bluefruit.connected();
 }
 
-void StateController :: load_settings() {
-    *settings = SettingManager();
+void StateController :: load_settings(void) {
+    settings = new SettingManager();
 }
 
-void StateController :: setup_rgbLED() {
-    #define NUMPIXELS 1
-    #define DATAPIN 8
-    #define CLOCKPIN 6
-    *rgbLED = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
-    rgbLED->begin();
-    rgbLED->setBrightness(10);
-    rgbLED->show();
+void StateController :: setup_rgbLED(void) {
+    strip = new Adafruit_DotStar(1, 8, 6, DOTSTAR_BGR);
+    int np = strip->numPixels();
+    strip->begin();
+    strip->setBrightness(13);
+    strip->show();
 }

@@ -1,39 +1,36 @@
 #ifndef STATE_CONTROLLER_H
 #define STATE_CONTROLLER_H
 
-#include <Arduino.h>
-#include <SPI.h>
 #include <Adafruit_DotStar.h>
+#include <SPI.h>
 #include <bluefruit.h>
+#include "state.h"
+#include "setting_manager.h"
 
-enum stateName {NULL_STATE, ADVERTISING_STATE, BURSTING_STATE, IDLE_STATE, PROGRAMMING_STATE};
-enum deviceStatus {DEVICE_OK, DEVICE_NO_CONNECT, DEVICE_INTERRUPT};
-
-class State;
-class SettingManager;
 class StateController {
     public:
-        State* currentState;
         State* stateList[5];
-        stateName previousState;
+        stateName currentState = NULL_STATE;
+        stateName previousState = NULL_STATE;
+        deviceStatus devStatus = DEVICE_NO_CONNECT;
         SettingManager* settings;
-        String reprogramSetting;
-        BLEUart* bleuart;
-        deviceStatus devStatus;
+        String reprogramSetting = "";
+        uint32_t reprogramValue = 0; 
+        Adafruit_DotStar* strip;
+        
+        BLEUart bleuart;
 
-        StateController();
-        void add_state(State* state);
+        StateController(void);
+        void add_state(State& state);
         void go_to_state(stateName name);
-        void update();
-        void set_rgbLED(int rVal, int gVal, int bVal);
-        bool is_connected();
+        void update(void);
+        void set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal);
+        bool is_connected(void);
         
     private:
-        Adafruit_DotStar* rgbLED;
-        void load_settings();
-        void setup_rgbLED();
+        void load_settings(void);
+        void setup_rgbLED(void);
 };
 #include "setting_manager.h"
-#include "state.h"
 
 #endif

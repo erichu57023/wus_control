@@ -1,18 +1,18 @@
 #include "setting_manager.h"
 #include "DEFAULT_SETTINGS.h"
 
-SettingManager :: SettingManager() :
-        pwm_wave_gen((unsigned short int) PWM_WAVE_GEN),
-        cs_tuss4470((unsigned short int) CS_TUSS4470),
-        cs_ad9833((unsigned short int) CS_AD9833),
-        cs_burst_control((unsigned short int) CS_BURST_CONTROL),
-        voltage((unsigned short int) VOLTAGE), 
-        frequency((unsigned int) FREQUENCY), 
-        timeout((unsigned int) TIMEOUT), 
-        burst_period((unsigned int) BURST_PERIOD),
-        pulse_count((unsigned int) PULSE_COUNT), 
-        duty_cycle((unsigned int) DUTY_CYCLE),
-        regulated_mode((bool)REGULATED_MODE), 
-        pre_driver_mode((bool)PRE_DRIVER_MODE), 
-        current_mode((bool)CURRENT_MODE), 
-        io_mode((bool)IO_MODE) {}
+SettingManager :: SettingManager(void) :
+        pwm_wave_gen(           static_cast<uint8_t>            (PWM_WAVE_GEN)),
+        cs_tuss4470(            static_cast<uint8_t>            (CS_TUSS4470)),
+        cs_ad9833(              static_cast<uint8_t>            (CS_AD9833)),
+        cs_burst_control(       static_cast<uint8_t>            (CS_BURST_CONTROL)),
+        voltage(                static_cast<uint8_t>            (VOLTAGE)), 
+        pulse_count(            static_cast<uint8_t>            (PULSE_COUNT)), 
+        duty_cycle(             static_cast<uint8_t>            (DUTY_CYCLE)),
+        frequency(              static_cast<uint32_t>           (FREQUENCY)), 
+        timeout(                static_cast<uint32_t>           (TIMEOUT)), 
+        burst_period(           static_cast<uint32_t>           (BURST_PERIOD)),
+        regulated_mode(         static_cast<bool>               (REGULATED_MODE)), 
+        io_mode(                static_cast<IOMode>             (IO_MODE)),
+        current_mode(           static_cast<CurrentType>        (CURRENT_MODE)),
+        pre_driver_mode(        static_cast<PreDriverMode>      (PRE_DRIVER_MODE)) {}
