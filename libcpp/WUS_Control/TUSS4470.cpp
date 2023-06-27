@@ -89,20 +89,20 @@ void TUSS4470 :: setPulseCount(uint8_t count) {
 // ----------------------------- Private functions ----------------------------- //
 
 void TUSS4470 :: updateVRDVRegister() {
-  Serial.println("VDRV");
+  // Serial.println("VDRV");
   uint8_t data = (_drvHiZ << 5) + (_drvCurrent << 4) + _drvVoltage;
   controlRegister(WRITE, 0x16, data);
 }
 
 void TUSS4470 :: updateBurstPulseRegister() {
-  Serial.println("BurstPulse");
+  // Serial.println("BurstPulse");
   uint8_t data = _pulseCount;
   if (_preDriver) {data += 0x40;}
   controlRegister(WRITE, 0x1A, data);
 }
 
 void TUSS4470 :: updateDevConfigRegister() {
-  Serial.println("DevConfig");
+  // Serial.println("DevConfig");
   uint8_t data = _ioMode;
   controlRegister(WRITE, 0x14, data);
 }
@@ -130,7 +130,7 @@ void TUSS4470 :: transferCommand(uint16_t data16) {
   digitalWrite(_CSpin, LOW);
   uint16_t rec16 = SPI.transfer16(data16);
   digitalWrite(_CSpin, HIGH);
-  Serial.println(data16, BIN);
-  Serial.println(rec16, BIN);
-  Serial.println();
+  // Serial.println(data16, BIN);
+  // Serial.println(rec16, BIN);
+  // Serial.println();
 }

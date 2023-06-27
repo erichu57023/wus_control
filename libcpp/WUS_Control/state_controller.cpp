@@ -1,25 +1,26 @@
 #include "state_controller.h"
+#include "state.h"
 
 StateController :: StateController(void) {
-    load_settings();
-    setup_rgbLED();
+    this->load_settings();
+    this->setup_rgbLED();
 }
 
-void StateController :: add_state(State& state) {
-    stateList[state.get_name()] = &state;
-}
-
-void StateController :: go_to_state(stateName name) {
-    if (currentState != NULL_STATE) {
-        previousState = stateList[currentState]->get_name();
-        stateList[currentState]->exit();
+void StateController :: go_to_state(State& newState) {
+    if (currentState) {
+        previousState = currentState->get_name();
+        currentState->exit(this);
     }
-    currentState = name;
-    stateList[currentState]->enter();
+    currentState = &newState;
+    currentState->enter(this);
+}
+
+stateName StateController :: current_state(void) {
+    return currentState->get_name();
 }
 
 void StateController :: update(void) {
-    stateList[currentState]->update();
+    currentState->update(this);
 }
 
 void StateController :: set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal) {
@@ -28,11 +29,11 @@ void StateController :: set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal) {
 }
 
 bool StateController :: is_connected(void) {
-    return Bluefruit.connected();
+    return this->bf.connected(this->connection);
 }
 
 void StateController :: load_settings(void) {
-    settings = new SettingManager();
+    settings = &SettingManager::getInstance();
 }
 
 void StateController :: setup_rgbLED(void) {
