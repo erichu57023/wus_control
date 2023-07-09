@@ -26,16 +26,11 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#include "nrf.h"
+#include "nrf_gpio.h"
+#include "setting_manager.h"
 
-//#define FNC_PIN 4			// Define FNC_PIN for fast digital writes
-
-#ifdef FNC_PIN
-	// Use digitalWriteFast for a speedup
-	#include "digitalWriteFast.h"
-	#define WRITE_FNCPIN(Val) digitalWriteFast2(FNC_PIN,(Val))
-#else  // otherwise, just use digitalWrite
-	#define WRITE_FNCPIN(Val) digitalWrite(FNCpin,(Val))
-#endif
+#define WRITE_FNCPIN(Val) nrf_gpio_pin_write(FNCpin,(Val))
 
 #define pow2_28				268435456L	// 2^28 used in frequency word calculation
 #define BITS_PER_DEG		11.3777777777778	// 4096 / 360
@@ -122,12 +117,10 @@ public:
 
 private:
 
-	void 			WriteRegister ( int16_t dat );
+	void 			WriteRegister ( uint16_t dat );
 	void 			WriteControlRegister ( void );
 	uint16_t		waveForm0, waveForm1;
-#ifndef FNC_PIN
 	uint8_t			FNCpin;
-#endif
 	uint8_t			outputEnabled, DacDisabled, IntClkDisabled;
 	uint32_t		refFrequency;
 	float			frequency0, frequency1, phase0, phase1;

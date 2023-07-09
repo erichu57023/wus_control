@@ -31,10 +31,10 @@ void BurstingState :: update(StateController* ctrl) {
 }
 
 void BurstingState :: set_parameters(StateController* ctrl) {
-    if (ctrl->settings->cs_burst_control == 2) {
-        this->ctrlPin = 34;                                    // Use hardware port value for fast toggle
-    }
-    nrf_gpio_cfg_output(this->ctrlPin);
+    // Use hardware port value for fast toggle
+    this->ctrlPort = nrf52840_port_map[ctrl->settings->cs_burst_control];
+
+    nrf_gpio_cfg_output(this->ctrlPort);
     this->pulseOff();
     this->timeout = ctrl->settings->timeout * 1e6;            // time in us
     this->pulsePeriod = ctrl->settings->burst_period * 1e3;   // time in us
@@ -45,11 +45,11 @@ void BurstingState :: set_parameters(StateController* ctrl) {
 }
 
 void BurstingState :: pulseOn(void) {
-    nrf_gpio_pin_set(this->ctrlPin);
+    nrf_gpio_pin_set(this->ctrlPort);
 }
 
 void BurstingState :: pulseOff(void) {
-    nrf_gpio_pin_clear(this->ctrlPin);
+    nrf_gpio_pin_clear(this->ctrlPort);
 }
 
 uint32_t BurstingState :: burst_elapsed(void) {

@@ -30,12 +30,9 @@
  */
 AD9833 :: AD9833 ( uint8_t FNCpin, uint32_t referenceFrequency ) {
 	// Pin used to enable SPI communication (active LOW)
-#ifdef FNC_PIN
-	pinMode(FNC_PIN,OUTPUT);
-#else
-	this->FNCpin = FNCpin;
-	pinMode(FNCpin,OUTPUT);
-#endif
+	
+	this->FNCpin = nrf52840_port_map[FNCpin];
+	nrf_gpio_cfg_output(this->FNCpin);
 	WRITE_FNCPIN(HIGH);
 
 	/* TODO: The minimum resolution and max frequency are determined by
@@ -196,6 +193,7 @@ void AD9833 :: SetPhase ( Registers phaseReg, float phaseInDeg ) {
 		phase1 = phaseInDeg;
 		phaseVal |= PHASE1_WRITE_REG;
 	}
+
 	WriteRegister(phaseVal);
 }
 
@@ -340,23 +338,13 @@ void AD9833 :: WriteControlRegister ( void ) {
 	WriteRegister ( waveForm );
 }
 
-void AD9833 :: WriteRegister ( int16_t dat ) {
-	/*
-	 * We set the mode here, because other hardware may be doing SPI also
-	 */
-	SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE2));
-
-	/* Improve overall switching speed
-	 * Note, the times are for this function call, not the write.
-	 * digitalWrite(FNCpin)			~ 17.6 usec
-	 * digitalWriteFast2(FNC_PIN)	~  8.8 usec
-	 */
+void AD9833 :: WriteRegister ( uint16_t dat ) {
+	SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE2));
 	WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
-
-	//delayMicroseconds(2);	// Some delay may be needed
-
-	// TODO: Are we running at the highest clock rate?
-	SPI.transfer16(dat);
-
+	uint16_t rec16 = SPI.transfer16(dat);
 	WRITE_FNCPIN(HIGH);		// Write done
+
+	// Serial.println(dat, BIN);
+	// Serial.println(rec16, BIN);
+	// Serial.println();
 }

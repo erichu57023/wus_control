@@ -8,12 +8,16 @@
 
 #include <Arduino.h>
 #include <SPI.h>
+#include "nrf.h"
+#include "nrf_gpio.h"
 
 typedef enum {READ = 0x8000, WRITE = 0x0000} CommandType;
 typedef enum {LOW_CURRENT = 0, HIGH_CURRENT = 1} CurrentType;
 typedef enum {HIZ_OFF = 0, HIZ_ON = 1} HiZType;
 typedef enum {IO_MODE0 = 0, IO_MODE1 = 1, IO_MODE2 = 2, IO_MODE3 = 3} IOMode;
 typedef enum {PRE_DRV0 = 0, PRE_DRV1 = 1} PreDriverMode;
+
+#include "setting_manager.h"
 
 const uint8_t RESET_ADDS[] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x16, 0x17, 0x18, 0x1A, 0x1B};
 const uint8_t RESET_DATA[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x07, 0x14, 0x00, 0x00};
