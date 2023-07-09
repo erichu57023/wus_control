@@ -18,13 +18,7 @@ void BurstingState :: exit(StateController* ctrl) {
 }
 
 void BurstingState :: update(StateController* ctrl) {
-    if (!ctrl->is_connected()) {
-        ctrl->devStatus = DEVICE_NO_CONNECT; 
-        ctrl->go_to_state(AdvertisingState::getInstance());
-    } else if (ctrl->bleuart.available()) {
-        ctrl->devStatus = DEVICE_INTERRUPT;
-        ctrl->go_to_state(InterruptState::getInstance());
-    } else if (this->burst_elapsed() > this->timeout) {         // timeout reached, return to idle
+    if (this->burst_elapsed() > this->timeout) {         // timeout reached, return to idle
         ctrl->go_to_state(IdleState::getInstance()); 
     } else {                                                   // continue current burst
         if (this->pulse_elapsed() > this->pulsePeriod) {      // start pulse if new period reached
