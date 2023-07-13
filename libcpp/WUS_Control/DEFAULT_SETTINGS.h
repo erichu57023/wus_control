@@ -22,7 +22,7 @@
 #define PRE_DRIVER_MODE 0
 
 // output voltage (only matters if internal regulator is on) (minimum 5, maximum 21)
-#define VOLTAGE 10
+#define VOLTAGE 5
 
 // current mode, used to charge the capacitor if using regulated mode (low = 0, high = 1)
 #define CURRENT_MODE 1
