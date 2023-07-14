@@ -5,7 +5,7 @@ stateName ProgrammingState :: get_name(void) {
 }
 
 void ProgrammingState :: enter(StateController* ctrl) {
-    Serial.println("programming");
+    // Serial.println("programming");
     ctrl->set_rgbLED(255, 255, 0); // yellow
     if (!this->initialized) {
         this->startup_sequence(ctrl);

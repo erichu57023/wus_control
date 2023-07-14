@@ -344,7 +344,7 @@ void AD9833 :: WriteRegister ( uint16_t dat ) {
 	uint16_t rec16 = SPI.transfer16(dat);
 	WRITE_FNCPIN(HIGH);		// Write done
 
-	Serial.println(dat, BIN);
-	Serial.println(rec16, BIN);
-	Serial.println();
+	// Serial.println(dat, BIN);
+	// Serial.println(rec16, BIN);
+	// Serial.println();
 }

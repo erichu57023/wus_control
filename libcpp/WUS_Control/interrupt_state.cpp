@@ -65,7 +65,7 @@ void InterruptState :: parse_command(StateController* ctrl) {
         } else if (str_equals(command, "burst_period")) {
             ctrl->reprogramSetting = BURSTPD_CHG;
         } else {
-            Serial.println("No such command!");
+            // Serial.println("No such command!");
         }
         ctrl->reprogramValue = strtoul(value, NULL, 10);
         ctrl->go_to_state(ProgrammingState::getInstance());
