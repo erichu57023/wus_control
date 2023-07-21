@@ -6,7 +6,6 @@
 #include "state_controller.h"
 #include "nrf.h"
 #include "nrf_gpio.h"
-#include <nRF52_PWM.h>
 
 class BurstingState: public State {
     public:
@@ -31,17 +30,18 @@ class BurstingState: public State {
         // Instance variables
         uint8_t ctrlPin;
         uint32_t timeout;
-        unsigned long burstStartTime;
-        float burstFreq;
-        float dutyCycle = 100.0f;
-        nRF52_PWM* burst_ctrl = nullptr;
+        bool burstActive;
+        unsigned long burstStartTime, stimStartTime, stimOnTime;
+        unsigned long stimPeriod = 1e6;
+        float burstFreq = 0.0f;
+        float burstDC = 100.0f;
+        float stimDC = 100.0f;
+        uint32_t dutyCycleComp = 0;
 
         // Methods
         void set_parameters(StateController* ctrl);
         void pulseOn(void);
         void pulseOff(void);
-        unsigned long burst_elapsed(void);
-//        unsigned long pulse_elapsed(void);
 
 };
 

@@ -27,7 +27,7 @@ class StateController {
         BLEUart bleuart;
         volatile deviceStatus devStatus = DEVICE_NO_CONNECT;
         volatile mutableSetting reprogramSetting = NO_CHG;
-        volatile uint32_t reprogramValue = 0; 
+        volatile float reprogramValue = 0; 
 
         // Methods
         void go_to_state(State& state);

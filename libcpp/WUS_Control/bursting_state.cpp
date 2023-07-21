@@ -9,7 +9,8 @@ void BurstingState :: enter(StateController* ctrl) {
 
     ctrl->set_rgbLED(0, 0, 255); // blue
     this->set_parameters(ctrl);
-    this->burstStartTime = micros();
+    this->stimStartTime = micros();
+    this->burstStartTime = this->stimStartTime;
     this->pulseOn();
 }
 
@@ -18,31 +19,59 @@ void BurstingState :: exit(StateController* ctrl) {
 }
 
 void BurstingState :: update(StateController* ctrl) {
-    if (micros() - this->burstStartTime > this->timeout) {         // timeout reached, return to idle
+    static unsigned long now, stim_now, burst_now;
+    now = micros();
+    burst_now = now - this->burstStartTime;
+    stim_now = now - this->stimStartTime;
+    
+    
+    if (stim_now > this->timeout) {         // timeout reached, return to idle
         ctrl->go_to_state(IdleState::getInstance()); 
+    } else if (burst_now > this->stimPeriod) {
+        this->burstStartTime = now;
+        this->pulseOn();
+    } else if (this->burstActive && burst_now > this->stimOnTime) {
+        this->pulseOff();
     }
 }
 
 void BurstingState :: set_parameters(StateController* ctrl) {
-    this->timeout = ctrl->settings->timeout * 1e6;            // time in us
-   
+    this->timeout = ctrl->settings->timeout * 1e3;            // time in us
     this->ctrlPin = ctrl->settings->cs_burst_control;
-    this->burstFreq = 1000.0f / (float) ctrl->settings->burst_period;
-    this->dutyCycle = 100.0f - (float) ctrl->settings->duty_cycle;  // Invert because ctrlPin is active LOW
-    
-    if (!this->burst_ctrl) {
-        this->burst_ctrl = new nRF52_PWM(this->ctrlPin, this->burstFreq, 100.0f);
+
+    if (!HwPWM0.checkPin(this->ctrlPin)) {
+        HwPWM0.setResolution(15);
+        HwPWM0.addPin(this->ctrlPin);
     }
+
+    float newBurstFreq = 1000000.0f / ctrl->settings->burst_pd;
+    float newBurstDC = ctrl->settings->burst_dc;
+    if (this->burstFreq != newBurstFreq || this->burstDC != newBurstDC) {
+        this->burstFreq = newBurstFreq;
+        this->burstDC = newBurstDC;
+        
+        uint32_t countTop = 16000000 / this->burstFreq;
+        uint8_t prescaler = 0;
+        while (countTop > 32768UL * pow(2, prescaler)) {
+            prescaler++;
+        }
+
+        uint32_t compareValue = countTop / pow(2, prescaler) - 1;
+        this->dutyCycleComp = round(map(this->burstDC, 0, 100.0f, 0, compareValue));
+        HwPWM0.setClockDiv((unsigned long) prescaler);
+        HwPWM0.setMaxValue(compareValue);
+    }
+    this->stimPeriod = ctrl->settings->stim_pd;
+    this->stimDC = ctrl->settings->stim_dc / 100;
+    this->stimOnTime = this->stimPeriod * this->stimDC;
 }
 
 void BurstingState :: pulseOn(void) {
-    this->burst_ctrl->setPWM(this->ctrlPin, this->burstFreq, this->dutyCycle);
+    HwPWM0.writePin(this->ctrlPin, this->dutyCycleComp, true);
+    this->burstActive = true;
 }
 
 void BurstingState :: pulseOff(void) {
-    this->burst_ctrl->setPWM_manual(this->ctrlPin, 100.0f);
-}
-
-unsigned long BurstingState :: burst_elapsed(void) {
-    return (micros() - this->burstStartTime);
+    HwPWM0.writePin(this->ctrlPin, 0, true);
+    this->burstActive = false;
 }
