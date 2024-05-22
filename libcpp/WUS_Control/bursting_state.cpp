@@ -69,9 +69,11 @@ void BurstingState :: set_parameters(StateController* ctrl) {
 void BurstingState :: pulseOn(void) {
     HwPWM0.writePin(this->ctrlPin, this->dutyCycleComp, true);
     this->burstActive = true;
+    nrf_gpio_pin_set(LED_PIN);
 }
 
 void BurstingState :: pulseOff(void) {
     HwPWM0.writePin(this->ctrlPin, 0, true);
     this->burstActive = false;
+    nrf_gpio_pin_clear(LED_PIN);
 }
