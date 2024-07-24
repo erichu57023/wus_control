@@ -16,11 +16,12 @@ typedef enum {LOW_CURRENT = 0, HIGH_CURRENT = 1} CurrentType;
 typedef enum {HIZ_OFF = 0, HIZ_ON = 1} HiZType;
 typedef enum {IO_MODE0 = 0, IO_MODE1 = 1, IO_MODE2 = 2, IO_MODE3 = 3} IOMode;
 typedef enum {PRE_DRV0 = 0, PRE_DRV1 = 1} PreDriverMode;
+typedef enum {STDBY_OFF = 0, STDBY_ON = 1} StandbyMode;
 
 #include "setting_manager.h"
 
 const uint8_t RESET_ADDS[] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x16, 0x17, 0x18, 0x1A, 0x1B};
-const uint8_t RESET_DATA[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x07, 0x14, 0x00, 0x00};
+const uint8_t RESET_DATA[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x07, 0x14, 0x00, 0x40};
 
 class TUSS4470 {
   public:
@@ -44,6 +45,12 @@ class TUSS4470 {
     
     // Enables pre-driver mode 
     void enablePreDriver();
+
+    // Disables standby mode
+    void disableStandbyMode();
+
+    // Enables standby mode
+    void enableStandbyMode();
     
     // Sets voltage, current, IO mode, and pulse count
     void set(uint8_t voltage, CurrentType current, IOMode mode, uint8_t pulse_count);
@@ -62,8 +69,9 @@ class TUSS4470 {
 
 
   private:
-    void updateVRDVRegister();
+    void updateVDRVRegister();
     void updateBurstPulseRegister();
+    void updateTOFConfigRegister();
     void updateDevConfigRegister();
     void controlRegister(CommandType rw, byte address, byte data);
     bool findParity16(uint16_t num);
@@ -73,6 +81,7 @@ class TUSS4470 {
     PreDriverMode _preDriver;
     CurrentType _drvCurrent;
     HiZType _drvHiZ;
+    StandbyMode _standbyMode;
     IOMode _ioMode;
 };
 

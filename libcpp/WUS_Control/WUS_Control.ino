@@ -8,7 +8,7 @@ StateController* device = &StateController::getInstance();
 
 void setup() {
   device->set_rgbLED(0, 0, 0);
-  device->go_to_state(AdvertisingState::getInstance());
+  device->go_to_state(ProgrammingState::getInstance());
 }
 
 void loop() {

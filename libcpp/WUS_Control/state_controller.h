@@ -5,6 +5,8 @@
 #include <SPI.h>
 #include <bluefruit.h>
 #include "setting_manager.h"
+#include "AD9833.h"
+#include "TUSS4470.h"
 
 enum stateName {NULL_STATE, ADVERTISING_STATE, BURSTING_STATE, IDLE_STATE, PROGRAMMING_STATE};
 enum deviceStatus {DEVICE_OK, DEVICE_NO_CONNECT, DEVICE_INTERRUPT};
@@ -25,6 +27,8 @@ class StateController {
         SettingManager* settings;
         Adafruit_DotStar* strip;
         BLEUart bleuart;
+        AD9833* waveGen;
+        TUSS4470* burstGen;
         volatile deviceStatus devStatus = DEVICE_NO_CONNECT;
         volatile mutableSetting reprogramSetting = NO_CHG;
         volatile float reprogramValue = 0; 

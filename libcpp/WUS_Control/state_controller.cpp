@@ -40,6 +40,6 @@ void StateController :: setup_rgbLED(void) {
     strip = new Adafruit_DotStar(1, 8, 6, DOTSTAR_BGR);
     int np = strip->numPixels();
     strip->begin();
-    strip->setBrightness(13);
+    strip->setBrightness(1);
     strip->show();
 }
