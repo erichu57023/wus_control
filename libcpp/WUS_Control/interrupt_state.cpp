@@ -9,14 +9,9 @@ void InterruptState :: enter(StateController* ctrl) {}
 void InterruptState :: exit(StateController* ctrl) {}
 
 void InterruptState :: update(StateController* ctrl) {
-    if (!ctrl->is_connected()) {
-        ctrl->devStatus = DEVICE_NO_CONNECT; 
-        ctrl->go_to_state(AdvertisingState::getInstance());
-    
-    } else if (ctrl->devStatus == DEVICE_INTERRUPT) {
+    if (ctrl->devStatus == DEVICE_INTERRUPT) {
         this->read_input_buffer(ctrl);
         this->parse_command(ctrl);
-
     } else {
         ctrl->devStatus = DEVICE_OK; 
         ctrl->go_to_state(IdleState::getInstance());

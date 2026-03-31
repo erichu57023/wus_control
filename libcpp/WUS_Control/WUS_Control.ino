@@ -9,7 +9,6 @@ StateController* device = &StateController::getInstance();
 void setup() {
     device->set_rgbLED(0, 0, 0);
     Serial.begin(115200);
-    // while (!Serial);
     device->go_to_state(AdvertisingState::getInstance());
 }
 

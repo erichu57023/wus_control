@@ -17,19 +17,11 @@ void ProgrammingState :: enter(StateController* ctrl) {
 void ProgrammingState :: exit(StateController* ctrl) {
     ctrl->reprogramSetting = NO_CHG;
     ctrl->reprogramValue = 0;
+    ctrl->devStatus = DEVICE_OK;
 }
 
-void ProgrammingState :: update(StateController* ctrl) {
-    if (!ctrl->is_connected()) {
-        ctrl->devStatus = DEVICE_NO_CONNECT; 
-        ctrl->go_to_state(AdvertisingState::getInstance());
-    } else if (ctrl->bleuart.available()) {
-        ctrl->devStatus = DEVICE_INTERRUPT;
-        ctrl->go_to_state(InterruptState::getInstance());
-    } else {
-        ctrl->devStatus = DEVICE_OK;
-        ctrl->go_to_state(IdleState::getInstance());
-    }
+void ProgrammingState :: update(StateController* ctrl) {    
+    ctrl->go_to_state(IdleState::getInstance());
 }
 
 void ProgrammingState :: startup_sequence(StateController* ctrl) {

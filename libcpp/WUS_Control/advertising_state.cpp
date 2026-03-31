@@ -6,29 +6,31 @@ stateName AdvertisingState :: get_name(void) {
 
 void AdvertisingState :: enter(StateController* ctrl) {
     ctrl->set_rgbLED(255, 0, 0); // red
-    this->start_adv(ctrl);
-    // Serial.println("advertising!");
+    if (!this->initialized) {this->initialize(ctrl);}
+    this->advertise(ctrl);
+    Serial.println("advertising!");
 }
 
 void AdvertisingState :: exit(StateController* ctrl) {
-    // ctrl->bf.Advertising.stop();
+    ctrl->bf.Advertising.stop();
 }
 
 void AdvertisingState :: update(StateController* ctrl) {
     if (ctrl->is_connected()) {
         ctrl->devStatus = DEVICE_OK;
-        // ctrl->go_to_state(ProgrammingState::getInstance());
+        ctrl->go_to_state(ProgrammingState::getInstance());
     }
 }
 
-void AdvertisingState :: start_adv(StateController* ctrl) {
+void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.autoConnLed(false);
     ctrl->bf.configPrphBandwidth(BANDWIDTH_MAX);
 
     ctrl->bf.begin();
     ctrl->bf.setTxPower(0);    // Check bluefruit.h for supported values
-    ctrl->bf.Periph.setConnectCallback(this->connect_callback);
-    ctrl->bf.Periph.setDisconnectCallback(this->disconnect_callback);
+
+    ctrl->bf.Periph.setConnectCallback(connect_callback);
+    ctrl->bf.Periph.setDisconnectCallback(disconnect_callback);
 
     this->bledfu.begin();
 
@@ -39,6 +41,7 @@ void AdvertisingState :: start_adv(StateController* ctrl) {
 
     // Configure and Start BLE Uart Service
     ctrl->bleuart.begin();
+    ctrl->bleuart.setRxCallback(uart_rx_callback);
 
     // Start BLE Battery Service
     this->blebas.begin();
@@ -52,23 +55,34 @@ void AdvertisingState :: start_adv(StateController* ctrl) {
     ctrl->bf.Advertising.addService(ctrl->bleuart);
     ctrl->bf.ScanResponse.addName();
 
-    ctrl->bf.Advertising.restartOnDisconnect(1);
+    ctrl->bf.Advertising.restartOnDisconnect(0);
     ctrl->bf.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
     ctrl->bf.Advertising.setFastTimeout(30);      // number of seconds in fast mode
+    
+    this->initialized = true;
+}
+
+void AdvertisingState :: advertise(StateController* ctrl) {
     ctrl->bf.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
-void AdvertisingState :: connect_callback(uint16_t conn_handle) {
+void connect_callback(uint16_t conn_handle) {
     // Get the reference to current connection
     StateController* ctrl = &StateController::getInstance();
     ctrl->connection = conn_handle;
-    // Serial.println(conn_handle);
 }
 
-void AdvertisingState :: disconnect_callback(uint16_t conn_handle, uint8_t reason) {
+void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
     (void) conn_handle;
     (void) reason;
 
     StateController* ctrl = &StateController::getInstance();
+    ctrl->devStatus = DEVICE_NO_CONNECT; 
     ctrl->go_to_state(AdvertisingState::getInstance());
+}
+
+void uart_rx_callback(uint16_t conn_handle) {
+    StateController* ctrl = &StateController::getInstance();
+    ctrl->devStatus = DEVICE_INTERRUPT;
+    ctrl->go_to_state(InterruptState::getInstance());
 }

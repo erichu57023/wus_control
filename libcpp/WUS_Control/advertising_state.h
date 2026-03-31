@@ -30,14 +30,18 @@ class AdvertisingState: public State {
         AdvertisingState(void) {};
 
         // Instance variables
+        bool initialized = false;
         BLEDfu bledfu;
         BLEDis bledis;
         BLEBas blebas;
 
         // Methods
-        void start_adv(StateController* ctrl);
-        static void connect_callback(uint16_t conn_handle);
-        static void disconnect_callback(uint16_t conn_handle, uint8_t reason); 
+        void initialize(StateController* ctrl);
+        void advertise(StateController* ctrl);
 };
+
+void connect_callback(uint16_t conn_handle);
+void disconnect_callback(uint16_t conn_handle, uint8_t reason); 
+void uart_rx_callback(uint16_t conn_handle);
 
 #endif
