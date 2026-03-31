@@ -6,8 +6,6 @@
 #include "advertising_state.h"
 #include "interrupt_state.h"
 #include "idle_state.h"
-#include "AD9833.h"
-#include "TUSS4470.h"
 
 class ProgrammingState: public State {
     public:
@@ -30,14 +28,12 @@ class ProgrammingState: public State {
         ProgrammingState(void) {};
 
         // Instance variables
-        AD9833* waveGen = nullptr;
-        TUSS4470* burstGen = nullptr;
         bool initialized = false;
 
         // Methods
         void startup_sequence(StateController* ctrl);
         void change_setting(StateController* ctrl);
-        void gpio_clock_8m(uint8_t pin);
+        // void gpio_clock_8m(uint8_t pin);
 };
 
 #endif
