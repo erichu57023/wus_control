@@ -3,8 +3,8 @@
    Author: Eric Hu, 1/10/2022
 */
 
-#ifndef __TUSS4470__
-#define __TUSS4470__
+#ifndef TUSS4470_H
+#define TUSS4470_H
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -13,6 +13,7 @@ typedef enum {READ = 0x8000, WRITE = 0x0000} CommandType;
 typedef enum {LOW_CURRENT = 0, HIGH_CURRENT = 1} CurrentType;
 typedef enum {HIZ_OFF = 0, HIZ_ON = 1} HiZType;
 typedef enum {IO_MODE0 = 0, IO_MODE1 = 1, IO_MODE2 = 2, IO_MODE3 = 3} IOMode;
+typedef enum {PRE_DRV0 = 0, PRE_DRV1 = 1} PreDriverMode;
 
 const uint8_t RESET_ADDS[] = {0x10, 0x11, 0x12, 0x13, 0x14, 0x16, 0x17, 0x18, 0x1A, 0x1B};
 const uint8_t RESET_DATA[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x07, 0x14, 0x00, 0x00};
@@ -20,7 +21,7 @@ const uint8_t RESET_DATA[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x20, 0x07, 0x14, 0x
 class TUSS4470 {
   public:
     // Initialize with controller's chip-select pin
-    TUSS4470(uint8_t CSpin, bool pre_driver);
+    TUSS4470(uint8_t CSpin);
 
     // Run immediately after creating TUSS4470 object
     void begin();
@@ -65,7 +66,7 @@ class TUSS4470 {
     void transferCommand(uint16_t data16);
 
     uint8_t _CSpin, _drvVoltage, _pulseCount;
-    bool _preDriver;
+    PreDriverMode _preDriver;
     CurrentType _drvCurrent;
     HiZType _drvHiZ;
     IOMode _ioMode;
