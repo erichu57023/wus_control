@@ -84,7 +84,7 @@ class WUS_Controller:
         try:
             start_time = monotonic_ns()
             while monotonic_ns() - start_time < timeout_ns:
-                self._burst_on();
+                self._burst_on()
                 self.wait(refresh_interval)
                 #exp._burst_on() # this give error 
                 #exp.wait(refresh_interval)

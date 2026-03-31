@@ -37,7 +37,7 @@ class ProgrammingState: public State {
         // Methods
         void startup_sequence(StateController* ctrl);
         void change_setting(StateController* ctrl);
-        void gpio_clock_8m(uint8_t pin);
+        // void gpio_clock_8m(uint8_t pin);
 };
 
 #endif
