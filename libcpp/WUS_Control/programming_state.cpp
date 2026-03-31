@@ -7,7 +7,7 @@ stateName ProgrammingState :: get_name(void) {
 void ProgrammingState :: enter(StateController* ctrl) {
     Serial.println("programming");
     ctrl->set_rgbLED(255, 255, 0); // yellow
-    if (!waveGen) {
+    if (!this->initialized) {
         this->startup_sequence(ctrl);
     } else if (ctrl->reprogramSetting != NO_CHG){
         this->change_setting(ctrl);
@@ -25,8 +25,9 @@ void ProgrammingState :: update(StateController* ctrl) {
 }
 
 void ProgrammingState :: startup_sequence(StateController* ctrl) {
-    #define refFreq 25000000UL
-    wavePWM = new nRF52_PWM(ctrl->settings->pwm_wave_gen, refFreq, 50.0f);
+    #define refFreq 8000000UL
+    // wavePWM = new nRF52_PWM(ctrl->settings->pwm_wave_gen, refFreq, 50.0f);
+    this->gpio_clock_8m(ctrl->settings->pwm_wave_gen);
     waveGen = new AD9833(ctrl->settings->cs_ad9833, refFreq);
     burstGen = new TUSS4470(ctrl->settings->cs_tuss4470);
 
@@ -39,6 +40,8 @@ void ProgrammingState :: startup_sequence(StateController* ctrl) {
                   ctrl->settings->io_mode, ctrl->settings->pulse_count);
     if (ctrl->settings->regulated_mode) {burstGen->enableRegulation();}
     if (ctrl->settings->pre_driver_mode) {burstGen->enablePreDriver();}
+
+    this->initialized = true;
 }
 
 void ProgrammingState :: change_setting(StateController* ctrl) {
@@ -71,4 +74,23 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
             ctrl->settings->burst_period = val;
             break;
     }
+}
+
+void ProgrammingState :: gpio_clock_8m(uint8_t pin) {
+    uint8_t pin_number = nrf52840_port_map[pin];
+    nrf_gpio_cfg_output(pin_number);
+    NRF_TIMER1->PRESCALER = 0; // 8MHz
+    NRF_TIMER1->SHORTS = TIMER_SHORTS_COMPARE0_CLEAR_Msk;
+    NRF_TIMER1->CC[0] = 1;
+
+    NRF_GPIOTE->CONFIG[0] = GPIOTE_CONFIG_MODE_Task | (pin_number << GPIOTE_CONFIG_PSEL_Pos) |
+                            (GPIOTE_CONFIG_POLARITY_Toggle << GPIOTE_CONFIG_POLARITY_Pos);
+
+    /*Connect TIMER event to GPIOTE out task*/
+    NRF_PPI->CH[0].EEP = (uint32_t) &NRF_TIMER1->EVENTS_COMPARE[0];
+    NRF_PPI->CH[0].TEP = (uint32_t) &NRF_GPIOTE->TASKS_OUT[0];
+    NRF_PPI->CHENSET   = 1;
+
+    /*Starts clock signal*/
+    NRF_TIMER1->TASKS_START = 1;
 }

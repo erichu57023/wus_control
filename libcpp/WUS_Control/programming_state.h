@@ -31,13 +31,15 @@ class ProgrammingState: public State {
         ProgrammingState(void) {};
 
         // Instance variables
-        nRF52_PWM* wavePWM = nullptr;
+        // nRF52_PWM* wavePWM = nullptr;
         AD9833* waveGen = nullptr;
         TUSS4470* burstGen = nullptr;
+        bool initialized = false;
 
         // Methods
         void startup_sequence(StateController* ctrl);
         void change_setting(StateController* ctrl);
+        void gpio_clock_8m(uint8_t pin);
 };
 
 #endif
