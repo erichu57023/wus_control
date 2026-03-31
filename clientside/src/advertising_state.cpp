@@ -1,4 +1,5 @@
 #include "advertising_state.h"
+#include "state_controller.h"
 
 stateName AdvertisingState :: get_name(void) {
     return ADVERTISING_STATE;
@@ -17,13 +18,14 @@ void AdvertisingState :: exit(StateController* ctrl) {
 void AdvertisingState :: update(StateController* ctrl) {
     if (ctrl->is_connected()) {
         ctrl->devStatus = DEVICE_OK;
-        ctrl->go_to_state(IdleState::getInstance());
+        ctrl->go_to_state(IDLE_STATE);
     }
+    Serial.println("Advertising!");
 }
 
 void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.autoConnLed(false);
-    ctrl->bf.configPrphBandwidth(BANDWIDTH_MAX);
+    ctrl->bf.configPrphBandwidth(BANDWIDTH_NORMAL);
 
     ctrl->bf.begin();
     ctrl->bf.setTxPower(0);    // nrf52840 supported values: [-40,-20,-16,-12,-8,-4,0,+2,+3,+4,+5,+6,+7,+8] dBm
@@ -78,13 +80,13 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     const uint32_t mutSetVals[]  = {0, sets->voltage, sets->pulse_count, freqInt, sets->timeout,
                                     sets->burst_pd, sets->stim_pd, burstDCInt, stimDCInt};
     const uint8_t mutSetLens[]  = {1, 1, 1, 4, 4, 4, 4, 4, 4};
-    String mutSetDescs[] = {"Burst Enabled", "Voltage", "Pulse Count", "Frequency (Hz)", "Timeout (ms)",
+    char mutSetDescs[][18] = {"Burst Enabled", "Voltage", "Pulse Count", "Frequency (Hz)", "Timeout (ms)",
                               "Burst Period (us)", "Stim Period (us)", "Burst DC (%)", "Stim DC (%)"};
     for (unsigned int i = 0; i < sizeof(mutSetUUIDs) / 2; i++) {
         BLECharacteristic* mutSet = mutSets[i];
         *mutSet = BLECharacteristic(mutSetUUIDs[i], RD_WTNR_NOTIFY, mutSetLens[i], true);
         mutSet->setPermission(SECMODE_OPEN, SECMODE_OPEN);
-        mutSet->setUserDescriptor(mutSetDescs[i].c_str());
+        mutSet->setUserDescriptor(mutSetDescs[i]);
         mutSet->setWriteCallback(setting_rx_callback);
         mutSet->begin();
         mutSet->write32(mutSetVals[i]);
@@ -112,7 +114,6 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.Advertising.setFastTimeout(30);      // number of seconds in fast mode
     
     this->initialized = true;
-    ctrl->set_rgbLED(0, 255, 255);
 }
 
 void AdvertisingState :: advertise(StateController* ctrl) {
@@ -131,7 +132,7 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
 
     StateController* ctrl = &StateController::getInstance();
     ctrl->devStatus = DEVICE_NO_CONNECT; 
-    ctrl->go_to_state(AdvertisingState::getInstance());
+    ctrl->go_to_state(ADVERTISING_STATE);
 }
 
 void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* data, uint16_t len) {
@@ -147,9 +148,9 @@ void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* 
 
     if (rx_uuid == ENABLE_UUID) {
         if (rx_data) {
-            ctrl->go_to_state(BurstingState::getInstance());
+            ctrl->go_to_state(BURSTING_STATE);
         } else {
-            ctrl->go_to_state(IdleState::getInstance());
+            ctrl->go_to_state(IDLE_STATE);
         }
         return;
     
@@ -163,6 +164,6 @@ void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* 
         } else {
             SettingManager::repgmVal = rx_data;
         }
-        ctrl->go_to_state(ProgrammingState::getInstance());
+        ctrl->go_to_state(PROGRAMMING_STATE);
     }    
 }

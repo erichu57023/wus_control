@@ -8,18 +8,13 @@
 #define MUT_SETTING_SRV_UUID    0x56F8
 #define ENABLE_UUID             0xE65F
 
-#include "DEFAULT_SETTINGS.h"
-#include <bluefruit.h>
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
-#include "state_controller.h"
 #include "state.h"
-#include "idle_state.h"
-#include "bursting_state.h"
-#include "setting_manager.h"
-#include "programming_state.h"
+#include <bluefruit.h>
 
+// Forward declarations
 class StateController;
+enum stateName : uint8_t;
+
 class AdvertisingState: public State {
     public:
         // Singleton constructor methods

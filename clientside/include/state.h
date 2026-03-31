@@ -5,11 +5,11 @@
 
 class State {
     public:
-        virtual ~State(void) {};
-        virtual stateName get_name(void);
-        virtual void enter(StateController* ctrl);
-        virtual void exit(StateController* ctrl);
-        virtual void update(StateController* ctrl);
+        virtual ~State(void) = default;
+        virtual stateName get_name(void) = 0;
+        virtual void enter(StateController* ctrl) = 0;
+        virtual void exit(StateController* ctrl) = 0;
+        virtual void update(StateController* ctrl) = 0;
 };
 
 #endif

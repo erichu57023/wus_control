@@ -2,8 +2,6 @@
 #define IDLE_STATE_H
 
 #include "state.h"
-#include "advertising_state.h"
-#include "state_controller.h"
 
 class IdleState: public State {
     public:

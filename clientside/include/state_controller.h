@@ -4,13 +4,17 @@
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
 #include <bluefruit.h>
-#include "setting_manager.h"
 #include "AD9833.h"
 #include "TUSS4470.h"
+#include "setting_manager.h"
+#include "DEFAULT_SETTINGS.h"
 
-enum stateName {NULL_STATE, ADVERTISING_STATE, BURSTING_STATE, IDLE_STATE, PROGRAMMING_STATE};
+enum stateName : uint8_t {NULL_STATE, ADVERTISING_STATE, BURSTING_STATE, IDLE_STATE, PROGRAMMING_STATE};
 enum deviceStatus {DEVICE_OK, DEVICE_NO_CONNECT, DEVICE_INTERRUPT};
+
+// Forward declarations
 class State;
+
 class StateController {
     public:
         // Singleton constructor methods
@@ -31,7 +35,7 @@ class StateController {
         volatile deviceStatus devStatus = DEVICE_NO_CONNECT;
 
         // Methods
-        void go_to_state(State& state);
+        void go_to_state(stateName newStateName);
         stateName current_state(void);
         void update(void);
         void set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal);

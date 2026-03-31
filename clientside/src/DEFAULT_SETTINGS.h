@@ -70,7 +70,7 @@ constexpr uint8_t   PULSE_COUNT = 0;
 constexpr uint32_t  STIM_PD = 5e6;
 
 // stimulation duty cycle percentage 0-100; must not be 0
-constexpr float     STIM_DC = 10;
+constexpr float     STIM_DC = 10.0;
 
 // arbitrary 8-bit waveform; max length 255; should end with 0; default tukey32
 // if arraysize(DC_SEQ_VALS) = 1 (scalar), its value is ignored and waveform smoothing is disabled

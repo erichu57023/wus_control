@@ -1,10 +1,11 @@
 #ifndef PROGRAMMING_STATE_H
 #define PROGRAMMING_STATE_H
 
-#include "state_controller.h"
 #include "state.h"
-#include "advertising_state.h"
-#include "idle_state.h"
+
+// Forward declarations
+class StateController; // Needed for compilation
+enum stateName : uint8_t;
 
 class ProgrammingState: public State {
     public:

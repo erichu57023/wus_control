@@ -2,16 +2,17 @@
 #define BURSTING_STATE_H
 
 #include "state.h"
-#include "advertising_state.h"
-#include "state_controller.h"
 #include "setting_manager.h"
 #include <nrfx_pwm.h>
-#include <nrfx_rtc.h>
-#include <nrfx_timer.h>
-#include <nrfx_ppi.h>
 extern "C" {
+    #include <hal/nrf_timer.h>
     #include <hal/nrf_gpiote.h>
+    #include <hal/nrf_ppi.h>
 }
+
+// Forward declarations
+class StateController; // Needed for compilation
+enum stateName : uint8_t;
 
 class BurstingState: public State {
     public:
@@ -29,12 +30,12 @@ class BurstingState: public State {
         void exit(StateController* ctrl);
         void update(StateController* ctrl);
         
-        void pulseOn(void);
-        void pulseOff(void);
+        static void pulseOn(void);
+        static void pulseOff(void);
 
         static void initialize(void);
         static void program_PWM(void);
-        static void program_burst_timer(void);
+        static void program_stim_timer(void);
         static void program_timeout_timer(void);
         static void program_event_hooks(void);
 
@@ -43,20 +44,20 @@ class BurstingState: public State {
         BurstingState(void) {};
 
         // Instance variables
-        static nrfx_pwm_t pwm_driver;
-        static nrfx_timer_t burstClock;
-        static nrfx_rtc_t timeoutClock;
-        static uint32_t* pwmTrigger;
+        static nrf_timer_cc_channel_t stimOffClock, stimOnClock, timeoutClock;
         static nrf_pwm_values_common_t compareSeq[256];
         static nrf_ppi_channel_t onHook, offHook;
         static constexpr bool centeredPWM = 0;
+        static constexpr uint32_t burstPin = nrf52840_port_map[SettingManager::cs_burst_control];
 
         // Methods
         static void program_simple_PWM();
         static void program_arbitrary_PWM();
-        static void irq_handler_RTC(nrfx_rtc_int_type_t int_type);
-
 
 };
+
+extern "C" {
+    void TIMER2_IRQHandler(void);
+}
 
 #endif

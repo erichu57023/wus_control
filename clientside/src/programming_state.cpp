@@ -1,11 +1,14 @@
 #include "programming_state.h"
+#include "state_controller.h"
+#include "bursting_state.h"
 
+// Return state name
 stateName ProgrammingState :: get_name(void) {
     return PROGRAMMING_STATE;
 }
 
+// Initialize all settings if starting up, otherwise change a particular setting as reported by AdvertisingState
 void ProgrammingState :: enter(StateController* ctrl) {
-    // Serial.println("programming");
     ctrl->set_rgbLED(255, 255, 0); // yellow
     if (!this->initialized) {
         this->startup_sequence(ctrl);
@@ -14,23 +17,26 @@ void ProgrammingState :: enter(StateController* ctrl) {
     }
 }
 
+// Clear temporary programming variables
 void ProgrammingState :: exit(StateController* ctrl) {
     ctrl->settings->repgmKey = NO_CHG;
     ctrl->settings->repgmVal = 0;
     ctrl->devStatus = DEVICE_OK;
 }
 
+// Progress to advertising state if not already connected, otherwise return to idle state
 void ProgrammingState :: update(StateController* ctrl) {    
   if (this->initialized) {
     // Return to idle state if already connected
-    ctrl->go_to_state(IdleState::getInstance());
+    ctrl->go_to_state(IDLE_STATE);
   } else {
     // Go to advertising if not connected (usually only at program start)
     this->initialized = true;
-    ctrl->go_to_state(AdvertisingState::getInstance());
+    ctrl->go_to_state(ADVERTISING_STATE);
   }
 }
 
+// Program default settings for burst and wave generators, and place in standby
 void ProgrammingState :: startup_sequence(StateController* ctrl) {
     #define refFreq 25000000UL
 
@@ -51,6 +57,7 @@ void ProgrammingState :: startup_sequence(StateController* ctrl) {
     ctrl->burstGen->enableStandbyMode();
 }
 
+// Change a particular setting as reported by AdvertisingState
 void ProgrammingState :: change_setting(StateController* ctrl) {
     uint32_t val = ctrl->settings->repgmVal;
     // Bit-cast to float if setting is a float by default
@@ -70,12 +77,12 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
 
         case STIMPD_CHG:
             ctrl->settings->stim_pd = val;
-            BurstingState::program_burst_timer();
+            BurstingState::program_stim_timer();
             break;
 
         case STIMDC_CHG:
             ctrl->settings->stim_dc = valFloat;
-            BurstingState::program_burst_timer();
+            BurstingState::program_stim_timer();
             break;
         
         case FREQ_CHG:
@@ -88,12 +95,12 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
             BurstingState::program_timeout_timer();
             break;
 
-        case VOLT_CHG: 
+        case VOLT_CHG:
             ctrl->settings->voltage = val;
             ctrl->burstGen->setVoltage(val);
             break;
 
-        case PULSECT_CHG: 
+        case PULSECT_CHG:
             ctrl->settings->pulse_count = val;
             ctrl->burstGen->setPulseCount(val);
             break;
@@ -104,6 +111,6 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
             BurstingState::program_PWM();
 
         case NO_CHG:
-            break;    
+            break;
     }
 }

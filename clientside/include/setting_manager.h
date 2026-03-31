@@ -18,9 +18,9 @@ enum mutableSetting : uint16_t {
     STIMDC_CHG = STIM_DC_UUID, 
     DCSEQ_CHG = DCSEQ_UUID
 };
-const uint8_t nrf52840_port_map[26] = {25, 24, 34,  6, 29, 27, 41, 40,  8,  7,  // Arduino pins 0-9
-                                        5, 26, 11, 12,  4, 30, 28, 31,  2,  3,  // Arduino pins 10-19
-                                      255, 16, 14, 20, 15, 13};                 // Arduino pins 20-25
+constexpr uint8_t nrf52840_port_map[26] = {25, 24, 34,  6, 29, 27, 41, 40,  8,  7,  // Arduino pins 0-9
+                                            5, 26, 11, 12,  4, 30, 28, 31,  2,  3,  // Arduino pins 10-19
+                                          255, 16, 14, 20, 15, 13};                 // Arduino pins 20-25
 
 class SettingManager {
     public:
