@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools >= 64"]
+build_backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["constants", "wus_server"] 
+
+[project]
+name = "wus_server"
+version = "1.0.0"
+description ='Python package to interface with a wireless ultrasound stimulator (WUS)'
+readme = "README.md"
+license = "MIT"
+keywords = ["wireless", "ultrasound", "interface", "python"]
+authors = [{name = "Eric Hu", email = "erichu57023@gmail.com"}]
+
+dependencies = [
+    "bleak",
+    "bleak-retry-connector"
+]

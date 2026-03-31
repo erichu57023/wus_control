@@ -65,6 +65,7 @@ class WUS_Server:
         ))
 
     def disconnect(self):
+        self.stop()
         if self.client is not None and self.client.is_connected:
             asyncio.run(self.client.disconnect())
             print("Disconnected from WUS device.")
