@@ -8,7 +8,9 @@
             "intelliSenseMode": "",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Program Files (x86)/Arduino/hardware/arduino/avr"
+                "C:/Program Files (x86)/Arduino/hardware/arduino/avr",
+                "C:/Users/Eric Hu/AppData/Local/Arduino15",
+                "C:/Users/Eric Hu/Documents/Arduino/libraries"
             ],
             "forcedInclude": [],
             "cStandard": "",
@@ -60,14 +62,15 @@
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Adafruit_TinyUSB_Arduino\\src\\arduino",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\cores\\nRF5",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\variants\\itsybitsy_nrf52840_express",
-                "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\SPI",
                 "C:\\Users\\Eric Hu\\Documents\\Arduino\\libraries\\Adafruit_DotStar",
                 "C:\\Users\\Eric Hu\\Documents\\Arduino\\libraries\\Adafruit_BusIO",
+                "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\SPI",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Bluefruit52Lib\\src",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Adafruit_nRFCrypto\\src",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Adafruit_TinyUSB_Arduino\\src",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Adafruit_LittleFS\\src",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\InternalFileSytem\\src",
+                "C:\\Users\\Eric Hu\\Documents\\Arduino\\libraries\\nRF52_PWM\\src",
                 "C:\\Users\\Eric Hu\\AppData\\Local\\Arduino15\\packages\\adafruit\\hardware\\nrf52\\1.4.0\\libraries\\Wire",
                 "c:\\users\\eric hu\\appdata\\local\\arduino15\\packages\\adafruit\\tools\\arm-none-eabi-gcc\\9-2019q4\\arm-none-eabi\\include\\c++\\9.2.1",
                 "c:\\users\\eric hu\\appdata\\local\\arduino15\\packages\\adafruit\\tools\\arm-none-eabi-gcc\\9-2019q4\\arm-none-eabi\\include\\c++\\9.2.1\\arm-none-eabi",
