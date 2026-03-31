@@ -1,3 +1,4 @@
+import time
 from wus_control.state import State
 
 mutable_settings = {'voltage':int, 'frequency':float, \
@@ -36,8 +37,8 @@ class InterruptState(State):
             controller.go_to_state('bursting')
         elif command[0] == 'off':
             controller.go_to_state('idle')
-        elif command[0] == 'settings':
-            controller.print('Settings: ' + str(controller.settings))
+        elif command[0] == 'setting':
+            controller.print(command[1] + ': ' + str(controller.settings[command[1]]))
             controller.go_to_state('idle')
         else:
             if command[0] not in mutable_settings:

@@ -1,5 +1,6 @@
 import board
 import adafruit_dotstar as dotstar
+from collections import OrderedDict
 from digitalio import DigitalInOut, Direction
 
 identity = lambda x: x
@@ -17,8 +18,9 @@ class StateController(object):
         self.states = {}
         self.ble = None
         self.uart = None
-        self.settings = {}
+        self.settings = OrderedDict()
         self._load_settings(settings_file)
+        self.previous_state = None
         self.reprogram_setting = None
         self.rgb_led = dotstar.DotStar(board.APA102_SCK, board.APA102_MOSI, 1, brightness=0.1)
 
@@ -27,6 +29,7 @@ class StateController(object):
 
     def go_to_state(self, state_name):
         if self.state:
+            self.previous_state = self.state.name
             self.state.exit(self)
         self.state = self.states[state_name]
         self.state.enter(self)

@@ -30,7 +30,6 @@ class BurstingState(State):
         if status == 'NO_CONNECT':
             controller.go_to_state('advertising')
         elif status == 'INTERRUPT':
-            print('\tStopped')
             controller.go_to_state('interrupt')
         elif self._burst_elapsed() > self._timeout:
             print('\tTimeout')
