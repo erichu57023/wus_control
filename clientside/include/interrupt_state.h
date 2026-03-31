@@ -9,8 +9,6 @@
 #include <string.h>
 
 #define BUFFER_LEN 64
-static char readBuffer[BUFFER_LEN];
-static bool str_equals(const char* strA, const char* strB);
 
 class InterruptState: public State {
     public:

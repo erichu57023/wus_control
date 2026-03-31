@@ -1,12 +1,20 @@
 #ifndef ADVERTISING_STATE_H
 #define ADVERTISING_STATE_H
 
-#include "state_controller.h"
-#include "state.h"
-#include "programming_state.h"
+#define RD_WTNR_NOTIFY 0b00010110
+
+// Randomly generated UUIDs
+#define CONST_SETTING_SRV_UUID  0xE8A5
+#define MUT_SETTING_SRV_UUID    0x56F8
+#define ENABLE_UUID             0xE65F
+
+#include "DEFAULT_SETTINGS.h"
 #include <bluefruit.h>
 #include <Adafruit_LittleFS.h>
 #include <InternalFileSystem.h>
+#include "state_controller.h"
+#include "state.h"
+#include "programming_state.h"
 
 class StateController;
 class AdvertisingState: public State {
@@ -31,9 +39,14 @@ class AdvertisingState: public State {
 
         // Instance variables
         bool initialized = false;
-        BLEDfu bledfu;
         BLEDis bledis;
-        BLEBas blebas;
+        BLEService constSetServ;
+        BLECharacteristic csTUSS4470Set, csAD9833Set, csBurstCTRLSet, regModeSet,
+                          preDriverModeSet, currentModeSet, ioModeSet;
+        
+        BLEService mutSetServ;
+        BLECharacteristic voltageSet, pulseCountSet, frequencySet, timeoutSet, 
+                          burstPDSet, stimPDSet, burstDCSet, stimDCSet;
 
         // Methods
         void initialize(StateController* ctrl);
@@ -43,5 +56,6 @@ class AdvertisingState: public State {
 void connect_callback(uint16_t conn_handle);
 void disconnect_callback(uint16_t conn_handle, uint8_t reason); 
 void uart_rx_callback(uint16_t conn_handle);
+void setting_rx_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint8_t* data, uint16_t len);
 
 #endif

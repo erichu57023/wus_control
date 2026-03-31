@@ -7,10 +7,11 @@
 StateController* device = &StateController::getInstance();
 
 void setup() {
-  device->set_rgbLED(0, 0, 0);
-  device->go_to_state(ProgrammingState::getInstance());
+    // Serial.begin(115200);
+    device->set_rgbLED(0, 0, 0);
+    device->go_to_state(ProgrammingState::getInstance());
 }
 
 void loop() {
-  device->update();
+    device->update();
 }

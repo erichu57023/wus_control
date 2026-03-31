@@ -27,11 +27,12 @@ class StateController {
         SettingManager* settings;
         Adafruit_DotStar* strip;
         BLEUart bleuart;
+        BLECharacteristic reportEnabled;
         AD9833* waveGen;
         TUSS4470* burstGen;
         volatile deviceStatus devStatus = DEVICE_NO_CONNECT;
         volatile mutableSetting reprogramSetting = NO_CHG;
-        volatile float reprogramValue = 0; 
+        volatile uint32_t reprogramValue = 0;
 
         // Methods
         void go_to_state(State& state);

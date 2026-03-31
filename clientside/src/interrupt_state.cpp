@@ -18,6 +18,12 @@ void InterruptState :: update(StateController* ctrl) {
     }
 }
 
+static bool str_equals(const char* strA, const char* strB) {
+    return (!strcmp(strA, strB));
+}
+
+static char readBuffer[BUFFER_LEN];
+
 void InterruptState :: read_input_buffer(StateController* ctrl) {
     uint8_t idx = 0;
     char charIn; 
@@ -52,30 +58,38 @@ void InterruptState :: parse_command(StateController* ctrl) {
             ctrl->go_to_state(IdleState::getInstance());
         }
     } else {
+        float newVal = atof(value);
+        uint32_t newValInt = static_cast<uint32_t>(newVal);
+        uint32_t newValRawBytes;
+        memcpy(&newValRawBytes, &newVal, 4);
         if (str_equals(command, "frequency")) {
             ctrl->reprogramSetting = FREQ_CHG;
+            ctrl->reprogramValue   = newValRawBytes;
         } else if (str_equals(command, "burst_pd")) {
             ctrl->reprogramSetting = BURSTPD_CHG;
+            ctrl->reprogramValue   = newValInt;
         } else if (str_equals(command, "burst_dc")) {
             ctrl->reprogramSetting = BURSTDC_CHG;
+            ctrl->reprogramValue   = newValRawBytes;
         } else if (str_equals(command, "stim_pd")) {
             ctrl->reprogramSetting = STIMPD_CHG;
+            ctrl->reprogramValue   = newValInt;
         } else if (str_equals(command, "stim_dc")) {
             ctrl->reprogramSetting = STIMDC_CHG;
+            ctrl->reprogramValue   = newValRawBytes;
         } else if (str_equals(command, "timeout")) {
             ctrl->reprogramSetting = TOUT_CHG;
+            ctrl->reprogramValue   = newValInt;
         } else if (str_equals(command, "voltage")) {
             ctrl->reprogramSetting = VOLT_CHG;
+            ctrl->reprogramValue   = newValInt;
         } else if (str_equals(command, "pulse_count")) {
             ctrl->reprogramSetting = PULSECT_CHG;
+            ctrl->reprogramValue   = newValInt;
         } else {
             // Serial.println("No such command!");
         }
-        ctrl->reprogramValue = atof(value);
         ctrl->go_to_state(ProgrammingState::getInstance());
     }
 }
 
-static bool str_equals(const char* strA, const char* strB) {
-    return (!strcmp(strA, strB));
-}

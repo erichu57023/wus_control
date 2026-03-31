@@ -146,7 +146,7 @@ bool TUSS4470 :: findParity16(uint16_t num) {
 void TUSS4470 :: transferCommand(uint16_t data16) {
   SPI.beginTransaction(SPISettings(500000, MSBFIRST, SPI_MODE1));
   nrf_gpio_pin_clear(_CSpin);        // csPin LOW
-  uint16_t rec16 = SPI.transfer16(data16);
+  // uint16_t rec16 = SPI.transfer16(data16);
   nrf_gpio_pin_set(_CSpin);          // csPin HIGH 
   
   // Serial.println(data16, BIN);

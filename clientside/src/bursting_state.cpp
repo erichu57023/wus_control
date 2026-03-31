@@ -9,6 +9,7 @@ void BurstingState :: enter(StateController* ctrl) {
 
     ctrl->set_rgbLED(0, 0, 255); // blue
     ctrl->burstGen->disableStandbyMode();
+    ctrl->reportEnabled.write8(1);
     this->set_parameters(ctrl);
     this->stimStartTime = micros();
     this->burstStartTime = this->stimStartTime;
@@ -18,6 +19,7 @@ void BurstingState :: enter(StateController* ctrl) {
 void BurstingState :: exit(StateController* ctrl) {
     ctrl->burstGen->enableStandbyMode();
     this->pulseOff();
+    ctrl->reportEnabled.write8(0);
 }
 
 void BurstingState :: update(StateController* ctrl) {
