@@ -31,6 +31,7 @@ class AdvertisingState(State):
     def exit(self, controller):
         State.exit(self, controller)
         self.red_led.value = False
+        self.ble.stop_advertising()
         print("\tConnected!")
 
     def update(self, controller):

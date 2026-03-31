@@ -37,7 +37,7 @@ class ProgrammingState(State):
 
     # Programs all settings
     def _startup_sequence(self, controller):
-        print("Startup: programming all settings...")
+        controller.print("Startup: programming all settings...")
         st = controller.settings
         spi_port = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
         self._wave_gen = AD9833(st['cs_ad9833'])
@@ -54,12 +54,12 @@ class ProgrammingState(State):
         self._burst_gen.set(st['voltage'], st['current_mode'], st['io_mode'], st['pulse_count'])
         if st['regulated_mode']: self._burst_gen.enableRegulation()
         if st['pre_driver_mode']: self._burst_gen.enablePreDriver()
-        print('\tDone!')
+        controller.print('\tDone!')
 
     # If one setting gets changed during runtime, no need to reprogram all the settings
     def _change_setting(self, controller):
         setting = controller.reprogram_setting
-        print('Reprogramming ' + str(setting[0]) + ' to ' + str(setting[1]))
+        controller.print('Reprogramming ' + str(setting[0]) + ' to ' + str(setting[1]))
         controller.settings[setting[0]] = setting[1]
        
         if setting[0] =='frequency':
@@ -68,4 +68,4 @@ class ProgrammingState(State):
             self._burst_gen.set_voltage(setting[1])
         if setting[0] == 'pulse_count':
             self._burst_gen.set_pulse_count(setting[1])
-        print('\tDone!')
+        controller.print('\tDone!')
