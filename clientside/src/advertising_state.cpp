@@ -36,10 +36,6 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     this->bledis.setModel("IB-nRF52840-X");
     this->bledis.begin();
 
-    // Configure and start BLE Uart Service
-    ctrl->bleuart.begin();
-    ctrl->bleuart.setRxCallback(uart_rx_callback);
-
     /////////// CONSTANT SETTINGS ///////////
     SettingManager* sets = ctrl->settings;
 
@@ -70,7 +66,7 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     this->mutSetServ = BLEService(MUT_SETTING_SRV_UUID);
     this->mutSetServ.begin();
 
-    // Configure and start a generic service for storing mutable (runtime) settings
+    // Configure and start a generic service for storing small mutable (runtime) settings
     BLECharacteristic* mutSets[] = {&ctrl->reportEnabled, &this->voltageSet, &this->pulseCountSet, &this->frequencySet, &this->timeoutSet,
                                     &this->burstPDSet, &this->stimPDSet, &this->burstDCSet, &this->stimDCSet}; 
     const uint16_t mutSetUUIDs[] = {ENABLE_UUID, VOLTAGE_UUID, PULSE_CT_UUID, FREQUENCY_UUID, TIMEOUT_UUID,
@@ -86,7 +82,7 @@ void AdvertisingState :: initialize(StateController* ctrl) {
                               "Burst Period (us)", "Stim Period (us)", "Burst DC (%)", "Stim DC (%)"};
     for (unsigned int i = 0; i < sizeof(mutSetUUIDs) / 2; i++) {
         BLECharacteristic* mutSet = mutSets[i];
-        *mutSet = BLECharacteristic(mutSetUUIDs[i], RD_WTNR_NOTIFY, mutSetLens[i], true); // Assumes all constant settings are 1 byte
+        *mutSet = BLECharacteristic(mutSetUUIDs[i], RD_WTNR_NOTIFY, mutSetLens[i], true);
         mutSet->setPermission(SECMODE_OPEN, SECMODE_OPEN);
         mutSet->setUserDescriptor(mutSetDescs[i].c_str());
         mutSet->setWriteCallback(setting_rx_callback);
@@ -94,12 +90,21 @@ void AdvertisingState :: initialize(StateController* ctrl) {
         mutSet->write32(mutSetVals[i]);
     }
 
+    // Configure service for long variable-length DC sequence characteristic
+    BLECharacteristic* dcSeqChar = &this->dcSeqSet;
+    *dcSeqChar = BLECharacteristic(DCSEQ_UUID, RD_WTNR_NOTIFY, sets->dc_seq_len, false);
+    dcSeqChar->setPermission(SECMODE_OPEN, SECMODE_OPEN);
+    dcSeqChar->setUserDescriptor("Custom DC Sequence");
+    dcSeqChar->setWriteCallback(setting_rx_callback);
+    dcSeqChar->begin();
+    dcSeqChar->write((void*) sets->dc_seq_vals, sets->dc_seq_len);
+
     // Advertising packet
     ctrl->bf.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
     ctrl->bf.Advertising.addTxPower();
 
     // Include UUIDs
-    ctrl->bf.Advertising.addService(ctrl->bleuart, this->constSetServ, this->mutSetServ);
+    ctrl->bf.Advertising.addService(this->constSetServ, this->mutSetServ);
     ctrl->bf.ScanResponse.addName();
 
     ctrl->bf.Advertising.restartOnDisconnect(0);
@@ -107,6 +112,7 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.Advertising.setFastTimeout(30);      // number of seconds in fast mode
     
     this->initialized = true;
+    ctrl->set_rgbLED(0, 255, 255);
 }
 
 void AdvertisingState :: advertise(StateController* ctrl) {
@@ -128,13 +134,6 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
     ctrl->go_to_state(AdvertisingState::getInstance());
 }
 
-void uart_rx_callback(uint16_t conn_handle) {
-    // UART interrupts go through InterruptState for further parsing
-    StateController* ctrl = &StateController::getInstance();
-    ctrl->devStatus = DEVICE_INTERRUPT;
-    ctrl->go_to_state(InterruptState::getInstance());
-}
-
 void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* data, uint16_t len) {
     StateController* ctrl = &StateController::getInstance();
 
@@ -146,46 +145,24 @@ void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* 
     uint32_t rx_data = 0;
     memcpy(&rx_data, data, len);
 
-    // Serial.println(rx_uuid, HEX);
-    // Serial.println(rx_data, HEX);
-
-    switch (rx_uuid) {
-        case ENABLE_UUID:
-            if (rx_data) {
-                ctrl->go_to_state(BurstingState::getInstance());
-            } else {
-                ctrl->go_to_state(IdleState::getInstance());
-            }
-            return;
-        
-        case BURST_PD_UUID:
-            ctrl->reprogramSetting = BURSTPD_CHG;
-            break;
-        case BURST_DC_UUID:
-            ctrl->reprogramSetting = BURSTDC_CHG;
-            break;
-        case STIM_PD_UUID:
-            ctrl->reprogramSetting = STIMPD_CHG;
-            break;
-        case STIM_DC_UUID:
-            ctrl->reprogramSetting = STIMDC_CHG;
-            break;
-        case FREQUENCY_UUID:
-            ctrl->reprogramSetting = FREQ_CHG;
-            break;
-        case TIMEOUT_UUID:
-            ctrl->reprogramSetting = TOUT_CHG;
-            break;
-        case VOLTAGE_UUID: 
-            ctrl->reprogramSetting = VOLT_CHG;
-            break;
-        case PULSE_CT_UUID: 
-            ctrl->reprogramSetting = PULSECT_CHG;
-            break;
-    }
-
-    ctrl->devStatus = DEVICE_INTERRUPT;
-    ctrl->reprogramValue = rx_data;
-    // Bypass interrupt state if data comes through direct GATT writes
-    ctrl->go_to_state(ProgrammingState::getInstance());
+    if (rx_uuid == ENABLE_UUID) {
+        if (rx_data) {
+            ctrl->go_to_state(BurstingState::getInstance());
+        } else {
+            ctrl->go_to_state(IdleState::getInstance());
+        }
+        return;
+    
+    } else {
+        ctrl->settings->repgmKey = static_cast<mutableSetting>(rx_uuid);
+        ctrl->devStatus = DEVICE_INTERRUPT;
+        // Pass pointer to DCSEQ array directly since repgmVal can only store a uint32
+        if (SettingManager::repgmKey == DCSEQ_CHG) {
+            SettingManager::dc_seq_len = len;
+            SettingManager::repgmVal = reinterpret_cast<uint32_t>(&rx_data);
+        } else {
+            SettingManager::repgmVal = rx_data;
+        }
+        ctrl->go_to_state(ProgrammingState::getInstance());
+    }    
 }

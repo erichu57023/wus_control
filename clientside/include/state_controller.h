@@ -25,14 +25,10 @@ class StateController {
         AdafruitBluefruit& bf = Bluefruit;
         volatile uint16_t connection;
         SettingManager* settings;
-        Adafruit_DotStar* strip;
-        BLEUart bleuart;
         BLECharacteristic reportEnabled;
         AD9833* waveGen;
         TUSS4470* burstGen;
         volatile deviceStatus devStatus = DEVICE_NO_CONNECT;
-        volatile mutableSetting reprogramSetting = NO_CHG;
-        volatile uint32_t reprogramValue = 0;
 
         // Methods
         void go_to_state(State& state);
@@ -40,6 +36,7 @@ class StateController {
         void update(void);
         void set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal);
         bool is_connected(void);
+        void report_bursting(bool burstOn);
         
     private:
         // Constructor
@@ -47,7 +44,8 @@ class StateController {
 
         // Instance variables
         State* currentState = nullptr;
-        stateName previousState = NULL_STATE;
+        // stateName previousState = NULL_STATE;
+        Adafruit_DotStar* strip;
 
         // Methods
         void load_settings(void);

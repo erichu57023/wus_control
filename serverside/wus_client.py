@@ -32,7 +32,7 @@ except ImportError:
     exit(1)
 
 
-class WUS_Controller:
+class WUS_Client:
     valid_commands = ['on', 'off', 'cs_ad9833', 'cs_tuss4470', \
         'cs_burst_control', 'regulated_mode', 'pre_driver_mode', \
         'voltage', 'current_mode', 'io_mode', \
@@ -123,7 +123,7 @@ class WUS_Controller:
 # Example connection
 if __name__ == '__main__':
     try:
-        exp = WUS_Controller()
+        exp = WUS_Client()
         exp.connect()
         exp.set('pulse_count', 0)
         exp.set('frequency', 450000)

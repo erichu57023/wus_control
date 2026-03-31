@@ -4,7 +4,6 @@
 #include "state_controller.h"
 #include "state.h"
 #include "advertising_state.h"
-#include "interrupt_state.h"
 #include "idle_state.h"
 
 class ProgrammingState: public State {
@@ -33,7 +32,6 @@ class ProgrammingState: public State {
         // Methods
         void startup_sequence(StateController* ctrl);
         void change_setting(StateController* ctrl);
-        // void gpio_clock_8m(uint8_t pin);
 };
 
 #endif

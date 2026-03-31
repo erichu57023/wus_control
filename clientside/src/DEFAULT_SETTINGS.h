@@ -17,58 +17,67 @@
 #define STIM_PD_UUID            0xD067
 #define BURST_DC_UUID           0x7AD9
 #define STIM_DC_UUID            0xCDE8
+#define DCSEQ_UUID              0x6F3C
+
+#define LED_PIN 6UL
 
 #include <Arduino.h>
 
 /* ------------ POWER OPTIONS ------------ */
 
 // the chip-select pin for the TUSS4470
-const uint8_t   CS_TUSS4470 = 12;
+constexpr uint8_t   CS_TUSS4470 = 12;
 
 // the chip-select pin for the AD9833
-const uint8_t   CS_AD9833 = 13;
+constexpr uint8_t   CS_AD9833 = 13;
 
 // the pin that controls bursting of the TUSS4470
-const uint8_t   CS_BURST_CONTROL = 14;
+constexpr uint8_t   CS_BURST_CONTROL = 14;
 
 // regulated mode, turns on TUSS4470 internal voltage regulator (1 = on, 0 = off)
-const bool      REGULATED_MODE = 1;
+constexpr bool      REGULATED_MODE = 1;
 
 // pre-driver mode, use only if driving external transistors with the TUSS4470 (1 = on, 0 = off)
-const bool      PRE_DRIVER_MODE = 1;
+constexpr bool      PRE_DRIVER_MODE = 1;
 
 // output voltage (only matters if internal regulator is on) (minimum 5, maximum 21)
-const uint8_t   VOLTAGE = 5;
+constexpr uint8_t   VOLTAGE = 5;
 
 // current mode, used to charge the capacitor if using regulated mode (0 = low, 1 = high)
-const bool      CURRENT_MODE = 1;
+constexpr bool      CURRENT_MODE = 1;
 
 // IO mode, check TUSS4470 datasheet for more info 
-const uint8_t   IO_MODE = 1;
+constexpr uint8_t   IO_MODE = 1;
 
 /* ------------ BURST OPTIONS ------------ */
 
 // fundamental frequency in Hz
-const float     FREQUENCY = 450e3;
+constexpr float     FREQUENCY = 450e3;
 
 // maximum duration of burst stimulation in MILLIseconds
-const uint32_t  TIMEOUT = 10e3;
+constexpr uint32_t  TIMEOUT = 10e3;
 
 // burst period in MICROseconds
-const uint32_t  BURST_PD = 10e3;
+constexpr uint32_t  BURST_PD = 10e3;
 
-// burst duty cycle percentage 0-100, ONLY matters if PULSE_COUNT = 0
-const float     BURST_DC = 50.0;
+// burst duty cycle percentage 0-100, ONLY matters if PULSE_COUNT = 0; must not be 0
+constexpr float     BURST_DC = 50.0;
 
 // number of pulses per burst; continuous if set to 0; maximum of 63
-const uint8_t   PULSE_COUNT = 0;
+constexpr uint8_t   PULSE_COUNT = 0;
 
 // stimulation period in MICROseconds
-const uint32_t  STIM_PD = 5e6;
+constexpr uint32_t  STIM_PD = 5e6;
 
-// stimulation duty cycle percentage 0-100
-const float     STIM_DC = 10;
+// stimulation duty cycle percentage 0-100; must not be 0
+constexpr float     STIM_DC = 10;
 
-/* --------------------------------------- */
+// arbitrary 8-bit waveform; max length 255; should end with 0; default tukey32
+// if arraysize(DC_SEQ_VALS) = 1 (scalar), its value is ignored and waveform smoothing is disabled
+constexpr uint8_t   DC_SEQ_VALS[32] = {  10,  37,  79, 128, 176, 218, 245, 255, 
+                                        255, 255, 255, 255, 255, 255, 255, 255, 
+                                        255, 255, 255, 255, 255, 255, 255, 255, 
+                                        245, 218, 176, 128,  79,  37,  10,   0  };
+
 
 #endif

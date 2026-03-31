@@ -14,6 +14,9 @@
 #include <InternalFileSystem.h>
 #include "state_controller.h"
 #include "state.h"
+#include "idle_state.h"
+#include "bursting_state.h"
+#include "setting_manager.h"
 #include "programming_state.h"
 
 class StateController;
@@ -46,16 +49,16 @@ class AdvertisingState: public State {
         
         BLEService mutSetServ;
         BLECharacteristic voltageSet, pulseCountSet, frequencySet, timeoutSet, 
-                          burstPDSet, stimPDSet, burstDCSet, stimDCSet;
+                          burstPDSet, stimPDSet, burstDCSet, stimDCSet, dcSeqSet;
 
         // Methods
         void initialize(StateController* ctrl);
         void advertise(StateController* ctrl);
+
 };
 
 void connect_callback(uint16_t conn_handle);
-void disconnect_callback(uint16_t conn_handle, uint8_t reason); 
-void uart_rx_callback(uint16_t conn_handle);
+void disconnect_callback(uint16_t conn_handle, uint8_t reason);
 void setting_rx_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint8_t* data, uint16_t len);
 
 #endif

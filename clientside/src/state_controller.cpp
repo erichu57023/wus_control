@@ -7,29 +7,33 @@ StateController :: StateController(void) {
 }
 
 void StateController :: go_to_state(State& newState) {
-    if (currentState) {
-        previousState = currentState->get_name();
-        currentState->exit(this);
+    if (this->currentState) {
+        // previousState = currentState->get_name();
+        this->currentState->exit(this);
     }
-    currentState = &newState;
-    currentState->enter(this);
+    this->currentState = &newState;
+    this->currentState->enter(this);
 }
 
 stateName StateController :: current_state(void) {
-    return currentState->get_name();
+    return this->currentState->get_name();
 }
 
 void StateController :: update(void) {
-    currentState->update(this);
+    this->currentState->update(this);
 }
 
 void StateController :: set_rgbLED(uint8_t rVal, uint8_t gVal, uint8_t bVal) {
-    strip->setPixelColor(0, rVal, gVal, bVal);
-    strip->show();
+    this->strip->setPixelColor(0, rVal, gVal, bVal);
+    this->strip->show();
 }
 
 bool StateController :: is_connected(void) {
     return this->bf.connected(this->connection);
+}
+
+void StateController :: report_bursting(bool burstOn) {
+    this->reportEnabled.write8(burstOn);
 }
 
 void StateController :: load_settings(void) {
@@ -37,9 +41,8 @@ void StateController :: load_settings(void) {
 }
 
 void StateController :: setup_rgbLED(void) {
-    strip = new Adafruit_DotStar(1, 8, 6, DOTSTAR_BGR);
-    // int np = strip->numPixels();
-    strip->begin();
-    strip->setBrightness(1);
-    strip->show();
+    this->strip = new Adafruit_DotStar(1, 8, 6, DOTSTAR_BGR);
+    this->strip->begin();
+    this->strip->setBrightness(1);
+    this->strip->show();
 }

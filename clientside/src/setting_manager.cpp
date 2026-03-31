@@ -1,19 +1,20 @@
 #include "setting_manager.h"
-#include "DEFAULT_SETTINGS.h"
 
-SettingManager :: SettingManager(void) :
-    cs_tuss4470(        CS_TUSS4470                                     ),
-    cs_ad9833(          CS_AD9833                                       ),
-    cs_burst_control(   CS_BURST_CONTROL                                ),
-    regulated_mode(     REGULATED_MODE                                  ), 
-    io_mode(            static_cast<IOMode>         (IO_MODE)           ),
-    current_mode(       static_cast<CurrentType>    (CURRENT_MODE)      ),
-    pre_driver_mode(    static_cast<PreDriverMode>  (PRE_DRIVER_MODE)   ),
-    voltage(            VOLTAGE                                         ), 
-    pulse_count(        PULSE_COUNT                                     ), 
-    frequency(          FREQUENCY                                       ), 
-    timeout(            TIMEOUT                                         ), 
-    burst_pd(           BURST_PD                                        ),
-    stim_pd(            STIM_PD                                         ),
-    burst_dc(           BURST_DC                                        ),
-    stim_dc(            STIM_DC                                         ) {}
+volatile uint8_t  SettingManager :: voltage     = VOLTAGE;
+volatile uint8_t  SettingManager :: pulse_count = PULSE_COUNT;
+volatile float    SettingManager :: frequency   = FREQUENCY;
+volatile uint32_t SettingManager :: timeout     = TIMEOUT;
+volatile uint32_t SettingManager :: burst_pd    = BURST_PD;
+volatile uint32_t SettingManager :: stim_pd     = STIM_PD;
+volatile float    SettingManager :: burst_dc    = BURST_DC / 100;
+volatile float    SettingManager :: stim_dc     = STIM_DC / 100;
+volatile uint8_t  SettingManager :: dc_seq_len  = arraysize(DC_SEQ_VALS);
+volatile uint8_t  SettingManager :: dc_seq_vals[256];
+
+volatile mutableSetting SettingManager :: repgmKey = NO_CHG; 
+volatile uint32_t       SettingManager :: repgmVal = 0;
+
+SettingManager :: SettingManager(void) {
+    // Must copy data over dynamically
+    memcpy((void*) dc_seq_vals, DC_SEQ_VALS, arraysize(DC_SEQ_VALS)); 
+}

@@ -341,7 +341,7 @@ void AD9833 :: WriteControlRegister ( void ) {
 void AD9833 :: WriteRegister ( uint16_t dat ) {
 	SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE2));
 	WRITE_FNCPIN(LOW);		// FNCpin low to write to AD9833
-	uint16_t rec16 = SPI.transfer16(dat);
+	// uint16_t rec16 = SPI.transfer16(dat);
 	WRITE_FNCPIN(HIGH);		// Write done
 
 	// Serial.println(dat, BIN);
