@@ -5,7 +5,7 @@ stateName IdleState :: get_name(void) {
 }
 
 void IdleState :: enter(StateController* ctrl) {
-    Serial.println("idle");
+    // Serial.println("idle");
     ctrl->set_rgbLED(0, 255, 0); // green
 }
 

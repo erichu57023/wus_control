@@ -8,7 +8,7 @@ void AdvertisingState :: enter(StateController* ctrl) {
     ctrl->set_rgbLED(255, 0, 0); // red
     if (!this->initialized) {this->initialize(ctrl);}
     this->advertise(ctrl);
-    Serial.println("advertising!");
+    // Serial.println("advertising!");
 }
 
 void AdvertisingState :: exit(StateController* ctrl) {

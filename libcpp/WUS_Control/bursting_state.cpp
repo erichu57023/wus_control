@@ -5,12 +5,12 @@ stateName BurstingState :: get_name(void) {
 }
 
 void BurstingState :: enter(StateController* ctrl) {
-    Serial.println("bursting");
+    // Serial.println("bursting");
 
     ctrl->set_rgbLED(0, 0, 255); // blue
     this->set_parameters(ctrl);
     this->burstStartTime = micros();
-    this->pulseStartTime = this->burstStartTime;
+    this->pulseOn();
 }
 
 void BurstingState :: exit(StateController* ctrl) {
@@ -18,44 +18,31 @@ void BurstingState :: exit(StateController* ctrl) {
 }
 
 void BurstingState :: update(StateController* ctrl) {
-    if (this->burst_elapsed() > this->timeout) {         // timeout reached, return to idle
+    if (micros() - this->burstStartTime > this->timeout) {         // timeout reached, return to idle
         ctrl->go_to_state(IdleState::getInstance()); 
-    } else {                                                   // continue current burst
-        if (this->pulse_elapsed() > this->pulsePeriod) {      // start pulse if new period reached
-            this->pulseStartTime = micros();
-            this->pulseOn();
-        } else if (this->pulse_elapsed() > this->onDuration) { // stop pulse if on duration reached
-            this->pulseOff();
-        }
     }
 }
 
 void BurstingState :: set_parameters(StateController* ctrl) {
-    // Use hardware port value for fast toggle
-    this->ctrlPort = nrf52840_port_map[ctrl->settings->cs_burst_control];
-    nrf_gpio_cfg_output(this->ctrlPort);
-    this->pulseOff();
-    
     this->timeout = ctrl->settings->timeout * 1e6;            // time in us
-    this->pulsePeriod = ctrl->settings->burst_period * 1e3;   // time in us
-    if (!ctrl->settings->pulse_count) {
-        this->dutyCycle = ctrl->settings->duty_cycle;          // duty cycle in percent
+   
+    this->ctrlPin = ctrl->settings->cs_burst_control;
+    this->burstFreq = 1000.0f / (float) ctrl->settings->burst_period;
+    this->dutyCycle = 100.0f - (float) ctrl->settings->duty_cycle;  // Invert because ctrlPin is active LOW
+    
+    if (!this->burst_ctrl) {
+        this->burst_ctrl = new nRF52_PWM(this->ctrlPin, this->burstFreq, 100.0f);
     }
-    this->onDuration = this->pulsePeriod * this->dutyCycle;
 }
 
 void BurstingState :: pulseOn(void) {
-    nrf_gpio_pin_clear(this->ctrlPort);
+    this->burst_ctrl->setPWM(this->ctrlPin, this->burstFreq, this->dutyCycle);
 }
 
 void BurstingState :: pulseOff(void) {
-    nrf_gpio_pin_set(this->ctrlPort);
+    this->burst_ctrl->setPWM_manual(this->ctrlPin, 100.0f);
 }
 
-uint32_t BurstingState :: burst_elapsed(void) {
+unsigned long BurstingState :: burst_elapsed(void) {
     return (micros() - this->burstStartTime);
-}
-
-uint32_t BurstingState :: pulse_elapsed(void) {
-    return (micros() - this->pulseStartTime);
 }
