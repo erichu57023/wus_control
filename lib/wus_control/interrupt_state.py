@@ -1,7 +1,7 @@
 import time
 from wus_control.state import State
 
-mutable_settings = {'voltage':int, 'frequency':float, \
+mutable_settings = {'voltage':int, 'frequency':int, \
         'timeout':float, 'burst_period':float, \
         'pulse_count':int, 'duty_cycle':float}
 

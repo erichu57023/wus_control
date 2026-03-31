@@ -6,7 +6,7 @@ from adafruit_bus_device.spi_device import SPIDevice
 class AD9833(object):
 
     # Clock Frequency
-    ClockFreq = 25000000
+    ClockFreq = 2000000
     freq = 10000
     shape_word = 0x2000
 

@@ -1,4 +1,4 @@
-import board, busio
+import board, busio, pwmio
 from wus_control.state import State
 from wus_control.hardware.AD9833 import AD9833
 from wus_control.hardware.TUSS4470 import TUSS4470
@@ -6,7 +6,8 @@ from wus_control.hardware.TUSS4470 import TUSS4470
 class ProgrammingState(State):
 
     def __init__(self):
-        self._wave_gen = None
+        # self._wave_gen = None
+        self._wave_pwm = None
         self._burst_gen = None
         self._comm_port = None
 
@@ -17,7 +18,8 @@ class ProgrammingState(State):
     def enter(self, controller):
         controller.rgb_led[0] = (255, 0, 0)
         State.enter(self, controller)
-        if not (self._wave_gen and self._burst_gen):    # When programming after advertising at startup
+        if not self._burst_gen:
+        # if not (self._wave_gen and self._burst_gen):    # When programming after advertising at startup
             self._startup_sequence(controller)
         elif controller.reprogram_setting:              # When programming single settings during runtime
             self._change_setting(controller)
@@ -44,8 +46,10 @@ class ProgrammingState(State):
         self._burst_gen = TUSS4470(st['cs_tuss4470'])
 
         # Program wave generator
+        self._wave_pwm = pwmio.PWMOut(pin=st['pwm_wave_gen'], duty_cycle=2**15, frequency=int(2e6), variable_frequency=False)
         self._wave_gen.begin(spi_port)
         self._wave_gen.set_freq(st['frequency'])
+        print(st['frequency'])
         self._wave_gen.set_type(1)
         self._wave_gen.send()
 
@@ -65,6 +69,7 @@ class ProgrammingState(State):
         if setting[0] =='frequency':
             self._wave_gen.set_freq(setting[1])
             self._wave_gen.send()
+            # self._wave_pwm.frequency = setting[1]
         elif setting[0] == 'voltage':
             self._burst_gen.set_voltage(setting[1])
         elif setting[0] == 'pulse_count':

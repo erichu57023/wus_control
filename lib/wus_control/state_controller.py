@@ -4,12 +4,13 @@ from collections import OrderedDict
 from digitalio import DigitalInOut, Direction
 
 identity = lambda x: x
-valid_settings = {'cs_ad9833':int, 'cs_tuss4470':int, \
+valid_settings = {'pwm_wave_gen':int, 'cs_tuss4470':int, \
         'cs_burst_control':int, 'regulated_mode':bool, \
         'pre_driver_mode':identity, 'voltage':int, \
         'current_mode':identity, 'io_mode':identity, \
-        'frequency':float, 'timeout':float, \
-        'burst_period':float, 'pulse_count':int, 'duty_cycle':float}
+        'frequency':int, 'timeout':float, \
+        'burst_period':float, 'pulse_count':int, \
+        'cs_ad9833':int, 'duty_cycle':float}
 
 class StateController(object):    
 
@@ -56,6 +57,8 @@ class StateController(object):
                         setting[1] = DigitalInOut(setting[1])
                         setting[1].direction = Direction.OUTPUT
                         setting[1].value = True
+                    elif setting[0].startswith('pwm_'):
+                        setting[1]= eval('board.D' + str(setting[1]))
                     else:                               # Parse setting values based on datatype
                         setting[1] = valid_settings[setting[0]](setting[1])
                     self.settings[setting[0]] = setting[1]
