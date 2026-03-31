@@ -8,6 +8,7 @@ void BurstingState :: enter(StateController* ctrl) {
     // Serial.println("bursting");
 
     ctrl->set_rgbLED(0, 0, 255); // blue
+    ctrl->burstGen->disableStandbyMode();
     this->set_parameters(ctrl);
     this->stimStartTime = micros();
     this->burstStartTime = this->stimStartTime;
@@ -15,6 +16,7 @@ void BurstingState :: enter(StateController* ctrl) {
 }
 
 void BurstingState :: exit(StateController* ctrl) {
+    ctrl->burstGen->enableStandbyMode();
     this->pulseOff();
 }
 
@@ -24,13 +26,14 @@ void BurstingState :: update(StateController* ctrl) {
     burst_now = now - this->burstStartTime;
     stim_now = now - this->stimStartTime;
     
-    
     if (stim_now > this->timeout) {         // timeout reached, return to idle
         ctrl->go_to_state(IdleState::getInstance()); 
     } else if (burst_now > this->stimPeriod) {
+        ctrl->burstGen->disableStandbyMode();
         this->burstStartTime = now;
         this->pulseOn();
     } else if (this->burstActive && burst_now > this->stimOnTime) {
+        ctrl->burstGen->enableStandbyMode();
         this->pulseOff();
     }
 }

@@ -18,7 +18,7 @@ void AdvertisingState :: exit(StateController* ctrl) {
 void AdvertisingState :: update(StateController* ctrl) {
     if (ctrl->is_connected()) {
         ctrl->devStatus = DEVICE_OK;
-        ctrl->go_to_state(ProgrammingState::getInstance());
+        ctrl->go_to_state(IdleState::getInstance());
     }
 }
 
@@ -27,7 +27,7 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.configPrphBandwidth(BANDWIDTH_MAX);
 
     ctrl->bf.begin();
-    ctrl->bf.setTxPower(0);    // Check bluefruit.h for supported values
+    ctrl->bf.setTxPower(0);    // nrf52840 supported values: [-40,-20,-16,-12,-8,-4,0,+2,+3,+4,+5,+6,+7,+8] dBm
 
     ctrl->bf.Periph.setConnectCallback(connect_callback);
     ctrl->bf.Periph.setDisconnectCallback(disconnect_callback);

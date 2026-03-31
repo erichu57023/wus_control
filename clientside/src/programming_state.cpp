@@ -21,27 +21,31 @@ void ProgrammingState :: exit(StateController* ctrl) {
 }
 
 void ProgrammingState :: update(StateController* ctrl) {    
+  if (this->initialized) {
     ctrl->go_to_state(IdleState::getInstance());
+  } else {
+    this->initialized = true;
+    ctrl->go_to_state(AdvertisingState::getInstance());
+  }
 }
 
 void ProgrammingState :: startup_sequence(StateController* ctrl) {
     #define refFreq 25000000UL
     
     // this->gpio_clock_8m(ctrl->settings->pwm_wave_gen);
-    waveGen = new AD9833(ctrl->settings->cs_ad9833, refFreq);
-    burstGen = new TUSS4470(ctrl->settings->cs_tuss4470);
+    ctrl->waveGen = new AD9833(ctrl->settings->cs_ad9833, refFreq);
+    ctrl->burstGen = new TUSS4470(ctrl->settings->cs_tuss4470);
 
-    waveGen->Begin();
-    waveGen->ApplySignal(SQUARE_WAVE, REG0, ctrl->settings->frequency);
-    waveGen->EnableOutput(true);
+    ctrl->waveGen->Begin();
+    ctrl->waveGen->DisableDAC(true);
+    ctrl->waveGen->ApplySignal(SQUARE_WAVE, REG0, ctrl->settings->frequency);
 
-    burstGen->begin();
-    burstGen->set(ctrl->settings->voltage, ctrl->settings->current_mode, 
+    ctrl->burstGen->begin();
+    ctrl->burstGen->set(ctrl->settings->voltage, ctrl->settings->current_mode, 
                   ctrl->settings->io_mode, ctrl->settings->pulse_count);
-    if (ctrl->settings->regulated_mode) {burstGen->enableRegulation();}
-    if (ctrl->settings->pre_driver_mode) {burstGen->enablePreDriver();}
-
-    this->initialized = true;
+    if (ctrl->settings->regulated_mode) {ctrl->burstGen->enableRegulation();}
+    if (ctrl->settings->pre_driver_mode) {ctrl->burstGen->enablePreDriver();}
+    ctrl->burstGen->enableStandbyMode();
 }
 
 void ProgrammingState :: change_setting(StateController* ctrl) {
@@ -66,7 +70,7 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
         
         case FREQ_CHG:
             ctrl->settings->frequency = val;
-            waveGen->SetFrequency(REG0, val);
+            ctrl->waveGen->SetFrequency(REG0, val);
             break;
         
         case TOUT_CHG:
@@ -75,12 +79,12 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
 
         case VOLT_CHG: 
             ctrl->settings->voltage = static_cast<uint8_t>(val);
-            burstGen->setVoltage(ctrl->settings->voltage);
+            ctrl->burstGen->setVoltage(ctrl->settings->voltage);
             break;
 
         case PULSECT_CHG: 
             ctrl->settings->pulse_count = static_cast<uint8_t>(val);
-            burstGen->setPulseCount(ctrl->settings->pulse_count);
+            ctrl->burstGen->setPulseCount(ctrl->settings->pulse_count);
             break;
 
     }

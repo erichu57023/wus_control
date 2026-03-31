@@ -15,6 +15,7 @@ TUSS4470 :: TUSS4470(uint8_t CSpin) {
   _drvVoltage = 0;
   _drvCurrent = LOW_CURRENT;
   _drvHiZ = HIZ_ON;
+  _standbyMode = STDBY_ON;
   _pulseCount = 0;
   _ioMode = IO_MODE0;
   _preDriver = PRE_DRV0;
@@ -31,18 +32,19 @@ void TUSS4470 :: reset() {
   _drvVoltage = 0;
   _drvCurrent = LOW_CURRENT;
   _drvHiZ = HIZ_ON;
+  _standbyMode = STDBY_ON;
   _pulseCount = 0;
   _ioMode = IO_MODE0;
 }
 
 void TUSS4470 :: disableRegulation() {
   _drvHiZ = HIZ_ON;
-  updateVRDVRegister();
+  updateVDRVRegister();
 }
 
 void TUSS4470 :: enableRegulation() {
   _drvHiZ = HIZ_OFF;
-  updateVRDVRegister();
+  updateVDRVRegister();
 }
 
 void TUSS4470 :: disablePreDriver() {
@@ -53,6 +55,16 @@ void TUSS4470 :: disablePreDriver() {
 void TUSS4470 :: enablePreDriver() {
   _preDriver = PRE_DRV1;
   updateBurstPulseRegister();
+}
+
+void TUSS4470 :: disableStandbyMode() {
+  _standbyMode = STDBY_OFF;
+  updateTOFConfigRegister();
+}
+
+void TUSS4470 :: enableStandbyMode() {
+  _standbyMode = STDBY_ON;
+  updateTOFConfigRegister();
 }
 
 void TUSS4470 :: set(uint8_t voltage, CurrentType current, IOMode mode, uint8_t pulse_count) {
@@ -66,12 +78,12 @@ void TUSS4470 :: setVoltage(uint8_t volt) {
   volt = (volt < 5) ? 0 : (volt - 5); // Set to 0 if under 5
   volt &= 0xF;  // Only count last 4 bits
   _drvVoltage = volt;
-  updateVRDVRegister();
+  updateVDRVRegister();
 }
 
 void TUSS4470 :: setCurrent(CurrentType curr) {
   _drvCurrent = curr;
-  updateVRDVRegister();
+  updateVDRVRegister();
 }
 
 void TUSS4470 :: setIOMode(IOMode mode) {
@@ -88,7 +100,7 @@ void TUSS4470 :: setPulseCount(uint8_t count) {
 
 // ----------------------------- Private functions ----------------------------- //
 
-void TUSS4470 :: updateVRDVRegister() {
+void TUSS4470 :: updateVDRVRegister() {
   // Serial.println("VDRV");
   uint8_t data = (_drvHiZ << 5) + (_drvCurrent << 4) + _drvVoltage;
   controlRegister(WRITE, 0x16, data);
@@ -99,6 +111,12 @@ void TUSS4470 :: updateBurstPulseRegister() {
   uint8_t data = _pulseCount;
   if (_preDriver) {data += 0x40;}
   controlRegister(WRITE, 0x1A, data);
+}
+
+void TUSS4470 :: updateTOFConfigRegister() {
+  // Serial.println("TOFConfig");
+  uint8_t data = _standbyMode << 6;
+  controlRegister(WRITE, 0x1B, data);
 }
 
 void TUSS4470 :: updateDevConfigRegister() {
