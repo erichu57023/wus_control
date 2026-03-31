@@ -64,8 +64,9 @@ class ProgrammingState(State):
        
         if setting[0] =='frequency':
             self._wave_gen.set_freq(setting[1])
-        if setting[0] == 'voltage':
+            self._wave_gen.send()
+        elif setting[0] == 'voltage':
             self._burst_gen.set_voltage(setting[1])
-        if setting[0] == 'pulse_count':
+        elif setting[0] == 'pulse_count':
             self._burst_gen.set_pulse_count(setting[1])
         controller.print('\tDone!')
