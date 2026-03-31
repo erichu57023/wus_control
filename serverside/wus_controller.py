@@ -84,9 +84,9 @@ class WUS_Controller:
         try:
             start_time = monotonic_ns()
             while monotonic_ns() - start_time < timeout_ns:
-                exp._burst_on()
-                exp.wait(refresh_interval)
-            exp._burst_off()
+                self._burst_on()
+                self.wait(refresh_interval)
+            self._burst_off()
         except KeyboardInterrupt:
             raise
 
