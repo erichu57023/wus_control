@@ -42,10 +42,10 @@
 #define BURST_PERIOD 10
 
 // number of pulses per burst; continuous if set to 0; maximum of 63
-#define PULSE_COUNT 20
+#define PULSE_COUNT 0
 
 // burst duty cycle percentage, ONLY matters if PULSE_COUNT = 0
-#define DUTY_CYCLE 20
+#define DUTY_CYCLE 50
 
 /* --------------------------------------- */
 

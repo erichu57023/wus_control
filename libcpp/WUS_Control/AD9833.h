@@ -56,8 +56,8 @@
 #define PHASE1_OUTPUT_REG	0x0400		// Output is based off REG0/REG1
 #define FREQ1_OUTPUT_REG	0x0800		// ditto
 
-typedef enum { SINE_WAVE = 0x2000, TRIANGLE_WAVE = 0x2002,
-			   SQUARE_WAVE = 0x2028, HALF_SQUARE_WAVE = 0x2020 } WaveformType;
+typedef enum { SINE_WAVE   = 0x2000, 	TRIANGLE_WAVE    = 0x2002,
+			   SQUARE_WAVE = 0x2028, 	HALF_SQUARE_WAVE = 0x2020 } WaveformType;
 			   
 typedef enum { REG0, REG1, SAME_AS_REG0 } Registers;
 
