@@ -1,6 +1,8 @@
 #ifndef BURSTING_STATE_H
 #define BURSTING_STATE_H
 
+#define LED_PIN 6
+
 #include "state.h"
 #include "advertising_state.h"
 #include "state_controller.h"

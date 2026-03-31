@@ -3,8 +3,8 @@
 
 /* ------------ POWER OPTIONS ------------ */
 
-// the pin where baseline frequency is output
-#define PWM_WAVE_GEN 11
+// the pin where baseline frequency is output (UNUSED IN WUSv1.2)
+#define PWM_WAVE_GEN 7
 
 // the chip-select pin for the TUSS4470
 #define CS_TUSS4470 12
@@ -13,13 +13,13 @@
 #define CS_AD9833 13
 
 // the pin that controls bursting of the TUSS4470
-#define CS_BURST_CONTROL 2
+#define CS_BURST_CONTROL 14
 
 // regulated mode, turns on TUSS4470 internal voltage regulator (1 = on, 0 = off)
 #define REGULATED_MODE 1
 
 // pre-driver mode, use only if driving external transistors with the TUSS4470 (1 = on, 0 = off)
-#define PRE_DRIVER_MODE 0
+#define PRE_DRIVER_MODE 1
 
 // output voltage (only matters if internal regulator is on) (minimum 5, maximum 21)
 #define VOLTAGE 5
@@ -48,10 +48,10 @@
 #define PULSE_COUNT 0
 
 // stimulation period in MICROseconds
-#define STIM_PD 1.5e6
+#define STIM_PD 2e6
 
 // stimulation duty cycle percentage 0-100
-#define STIM_DC 66.666666
+#define STIM_DC 25
 
 /* --------------------------------------- */
 

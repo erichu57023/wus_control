@@ -2,7 +2,7 @@
 #include "DEFAULT_SETTINGS.h"
 
 SettingManager :: SettingManager(void) :
-    pwm_wave_gen(           static_cast<uint8_t>            (PWM_WAVE_GEN)),
+    pwm_wave_gen(           static_cast<uint8_t>            (PWM_WAVE_GEN)), // unused in WUSv1.2!
     cs_tuss4470(            static_cast<uint8_t>            (CS_TUSS4470)),
     cs_ad9833(              static_cast<uint8_t>            (CS_AD9833)),
     cs_burst_control(       static_cast<uint8_t>            (CS_BURST_CONTROL)),
