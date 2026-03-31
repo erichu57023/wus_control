@@ -28,7 +28,7 @@ class BurstingState: public State {
         BurstingState(void) {};
 
         // Instance variables
-        uint8_t ctrlPin, counter;
+        uint8_t ctrlPort, counter;
         uint8_t dutyCycle = 50;
         uint32_t pulsePeriod, onDuration, timeout;
         uint64_t burstStartTime, pulseStartTime;

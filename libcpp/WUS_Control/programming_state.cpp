@@ -32,6 +32,7 @@ void ProgrammingState :: startup_sequence(StateController* ctrl) {
 
     waveGen->Begin();
     waveGen->ApplySignal(SQUARE_WAVE, REG0, static_cast<float>(ctrl->settings->frequency));
+    waveGen->EnableOutput(true);
 
     burstGen->begin();
     burstGen->set(ctrl->settings->voltage, ctrl->settings->current_mode, 

@@ -8,10 +8,10 @@
 // Create a TUSS4470 object
 TUSS4470 :: TUSS4470(uint8_t CSpin) {
   // Chip select pin to enable SPI (active low)
-  pinMode(CSpin, OUTPUT);
-  digitalWrite(CSpin, HIGH);
-  
-  _CSpin = CSpin;
+  _CSpin = nrf52840_port_map[CSpin];
+  nrf_gpio_cfg_output(_CSpin);
+  nrf_gpio_pin_set(_CSpin);
+
   _drvVoltage = 0;
   _drvCurrent = LOW_CURRENT;
   _drvHiZ = HIZ_ON;
@@ -120,16 +120,17 @@ void TUSS4470 :: controlRegister(CommandType rw, byte address, byte data) {
 bool TUSS4470 :: findParity16(uint16_t num) {
   num ^= num >> 8;
   num ^= num >> 4;
-  num ^= num >> 2; 
+  num ^= num >> 2;
   num ^= num >> 1;
   return num & 1;
 }
 
 void TUSS4470 :: transferCommand(uint16_t data16) {
-  SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE1));
-  digitalWrite(_CSpin, LOW);
+  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE1));
+  nrf_gpio_pin_clear(_CSpin);        // csPin LOW
   uint16_t rec16 = SPI.transfer16(data16);
-  digitalWrite(_CSpin, HIGH);
+  nrf_gpio_pin_set(_CSpin);          // csPin HIGH 
+  
   // Serial.println(data16, BIN);
   // Serial.println(rec16, BIN);
   // Serial.println();

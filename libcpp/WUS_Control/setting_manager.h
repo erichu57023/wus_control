@@ -5,6 +5,9 @@
 #include "TUSS4470.h"
 
 enum mutableSetting {NO_CHG, VOLT_CHG, PULSECT_CHG, DUTY_CHG, FREQ_CHG, TOUT_CHG, BURSTPD_CHG};
+const uint8_t nrf52840_port_map[26] = {25, 24, 34,  6, 29, 27, 41, 40,  8,  7,  // Arduino pins 0-9
+                                        5, 26, 11, 12,  4, 30, 28, 31,  2,  3,  // Arduino pins 10-19
+                                      255, 16, 14, 20, 15, 13};                 // Arduino pins 20-25
 
 class SettingManager {
     public:
