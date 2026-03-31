@@ -62,6 +62,7 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
     uint32_t val = ctrl->settings->repgmVal;
     // Bit-cast to float if setting is a float by default
     float valFloat;
+    uintptr_t val_ptr;
     memcpy(&valFloat, &val, 4);
 
     switch (ctrl->settings->repgmKey) {
@@ -107,8 +108,10 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
 
         case DCSEQ_CHG:
             // dc_seq_len already changed in AdvertisingState::setting_rx_callback
-            memcpy((void*) ctrl->settings->dc_seq_vals, reinterpret_cast<void*>(val), ctrl->settings->dc_seq_len);
+            val_ptr = static_cast<uintptr_t>(val);
+            memcpy((void*) ctrl->settings->dc_seq_vals, reinterpret_cast<void*>(val_ptr), ctrl->settings->dc_seq_len);
             BurstingState::program_PWM();
+            break;
 
         case NO_CHG:
             break;

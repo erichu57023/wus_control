@@ -1,6 +1,8 @@
 #ifndef DEFAULT_SETTINGS_H
 #define DEFAULT_SETTINGS_H
 
+#define DEVICE_NAME             "WUS Client"
+
 // Randomly generated UUIDs for each setting
 #define TUSS4470_UUID           0x288B
 #define AD9833_UUID             0x98CE
@@ -40,7 +42,7 @@ constexpr bool      REGULATED_MODE = 1;
 // pre-driver mode, use only if driving external transistors with the TUSS4470 (1 = on, 0 = off)
 constexpr bool      PRE_DRIVER_MODE = 1;
 
-// output voltage (only matters if internal regulator is on) (minimum 5, maximum 21)
+// output voltage (only matters if internal regulator is on) (minimum 5, maximum 20)
 constexpr uint8_t   VOLTAGE = 5;
 
 // current mode, used to charge the capacitor if using regulated mode (0 = low, 1 = high)

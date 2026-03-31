@@ -28,6 +28,7 @@ void AdvertisingState :: initialize(StateController* ctrl) {
     ctrl->bf.configPrphBandwidth(BANDWIDTH_NORMAL);
 
     ctrl->bf.begin();
+    ctrl->bf.setName(DEVICE_NAME);
     ctrl->bf.setTxPower(0);    // nrf52840 supported values: [-40,-20,-16,-12,-8,-4,0,+2,+3,+4,+5,+6,+7,+8] dBm
 
     ctrl->bf.Periph.setConnectCallback(connect_callback);
@@ -141,10 +142,12 @@ void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* 
     // Identify source UUID
     uint16_t rx_uuid = 0;
     chr->uuid.get(&rx_uuid);
-
-    // Aggregate incoming bytes into a uint32.
     uint32_t rx_data = 0;
-    memcpy(&rx_data, data, len);
+
+    // Aggregate incoming bytes into a uint32 for up to 4-byte settings
+    if (len <= 4) {
+        memcpy(&rx_data, data, len);
+    }
 
     if (rx_uuid == ENABLE_UUID) {
         if (rx_data) {
@@ -160,7 +163,7 @@ void setting_rx_callback(uint16_t conn_handle, BLECharacteristic* chr, uint8_t* 
         // Pass pointer to DCSEQ array directly since repgmVal can only store a uint32
         if (SettingManager::repgmKey == DCSEQ_CHG) {
             SettingManager::dc_seq_len = len;
-            SettingManager::repgmVal = reinterpret_cast<uint32_t>(&rx_data);
+            SettingManager::repgmVal = reinterpret_cast<uint32_t>(&data);
         } else {
             SettingManager::repgmVal = rx_data;
         }
