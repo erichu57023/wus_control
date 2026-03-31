@@ -26,13 +26,13 @@ void ProgrammingState :: update(StateController* ctrl) {
 
 void ProgrammingState :: startup_sequence(StateController* ctrl) {
     #define refFreq 8000000UL
-    // wavePWM = new nRF52_PWM(ctrl->settings->pwm_wave_gen, refFreq, 50.0f);
+    
     this->gpio_clock_8m(ctrl->settings->pwm_wave_gen);
     waveGen = new AD9833(ctrl->settings->cs_ad9833, refFreq);
     burstGen = new TUSS4470(ctrl->settings->cs_tuss4470);
 
     waveGen->Begin();
-    waveGen->ApplySignal(SQUARE_WAVE, REG0, static_cast<float>(ctrl->settings->frequency));
+    waveGen->ApplySignal(SQUARE_WAVE, REG0, ctrl->settings->frequency);
     waveGen->EnableOutput(true);
 
     burstGen->begin();
@@ -45,8 +45,34 @@ void ProgrammingState :: startup_sequence(StateController* ctrl) {
 }
 
 void ProgrammingState :: change_setting(StateController* ctrl) {
-    uint32_t val = ctrl->reprogramValue;
+    float val = ctrl->reprogramValue;
     switch (ctrl->reprogramSetting) {
+      
+        case BURSTPD_CHG:
+            ctrl->settings->burst_pd = static_cast<uint32_t>(val);
+            break;
+              
+        case BURSTDC_CHG:
+            ctrl->settings->burst_dc = val;
+            break;
+
+        case STIMPD_CHG:
+            ctrl->settings->stim_pd = static_cast<uint32_t>(val);
+            break;
+
+        case STIMDC_CHG:
+            ctrl->settings->stim_dc = val;
+            break;
+        
+        case FREQ_CHG:
+            ctrl->settings->frequency = val;
+            waveGen->SetFrequency(REG0, val);
+            break;
+        
+        case TOUT_CHG:
+            ctrl->settings->timeout = static_cast<uint32_t>(val);
+            break;
+
         case VOLT_CHG: 
             ctrl->settings->voltage = static_cast<uint8_t>(val);
             burstGen->setVoltage(ctrl->settings->voltage);
@@ -56,23 +82,7 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
             ctrl->settings->pulse_count = static_cast<uint8_t>(val);
             burstGen->setPulseCount(ctrl->settings->pulse_count);
             break;
-        
-        case DUTY_CHG:
-            ctrl->settings->duty_cycle = static_cast<uint8_t>(val);
-            break;
-        
-        case FREQ_CHG:
-            ctrl->settings->frequency = val;
-            waveGen->SetFrequency(REG0, static_cast<float>(val));
-            break;
-        
-        case TOUT_CHG:
-            ctrl->settings->timeout = val;
-            break;
-        
-        case BURSTPD_CHG:
-            ctrl->settings->burst_period = val;
-            break;
+
     }
 }
 

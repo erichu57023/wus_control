@@ -35,17 +35,23 @@
 // fundamental frequency in Hz
 #define FREQUENCY 450000
 
-// maximum duration of burst stimulation in seconds
-#define TIMEOUT 1
+// maximum duration of burst stimulation in MILLIseconds
+#define TIMEOUT 5e3
 
-// burst period in milliseconds
-#define BURST_PERIOD 10
+// burst period in MICROseconds
+#define BURST_PD 10e3
+
+// burst duty cycle percentage 0-100, ONLY matters if PULSE_COUNT = 0
+#define BURST_DC 50.0
 
 // number of pulses per burst; continuous if set to 0; maximum of 63
 #define PULSE_COUNT 0
 
-// burst duty cycle percentage, ONLY matters if PULSE_COUNT = 0
-#define DUTY_CYCLE 50
+// stimulation period in MICROseconds
+#define STIM_PD 1.5e6
+
+// stimulation duty cycle percentage 0-100
+#define STIM_DC 66.666666
 
 /* --------------------------------------- */
 

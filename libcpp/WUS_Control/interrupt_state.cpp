@@ -52,22 +52,26 @@ void InterruptState :: parse_command(StateController* ctrl) {
             ctrl->go_to_state(IdleState::getInstance());
         }
     } else {
-        if (str_equals(command, "voltage")) {
-            ctrl->reprogramSetting = VOLT_CHG;
-        } else if (str_equals(command, "duty_cycle")) {
-            ctrl->reprogramSetting = DUTY_CHG;
-        } else if (str_equals(command, "frequency")) {
+        if (str_equals(command, "frequency")) {
             ctrl->reprogramSetting = FREQ_CHG;
-        } else if (str_equals(command, "pulse_count")) {
-            ctrl->reprogramSetting = PULSECT_CHG;
+        } else if (str_equals(command, "burst_pd")) {
+            ctrl->reprogramSetting = BURSTPD_CHG;
+        } else if (str_equals(command, "burst_dc")) {
+            ctrl->reprogramSetting = BURSTDC_CHG;
+        } else if (str_equals(command, "stim_pd")) {
+            ctrl->reprogramSetting = STIMPD_CHG;
+        } else if (str_equals(command, "stim_dc")) {
+            ctrl->reprogramSetting = STIMDC_CHG;
         } else if (str_equals(command, "timeout")) {
             ctrl->reprogramSetting = TOUT_CHG;
-        } else if (str_equals(command, "burst_period")) {
-            ctrl->reprogramSetting = BURSTPD_CHG;
+        } else if (str_equals(command, "voltage")) {
+            ctrl->reprogramSetting = VOLT_CHG;
+        } else if (str_equals(command, "pulse_count")) {
+            ctrl->reprogramSetting = PULSECT_CHG;
         } else {
             // Serial.println("No such command!");
         }
-        ctrl->reprogramValue = strtoul(value, NULL, 10);
+        ctrl->reprogramValue = atof(value);
         ctrl->go_to_state(ProgrammingState::getInstance());
     }
 }

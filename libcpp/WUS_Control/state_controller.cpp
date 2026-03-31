@@ -33,7 +33,7 @@ bool StateController :: is_connected(void) {
 }
 
 void StateController :: load_settings(void) {
-    settings = &SettingManager::getInstance();
+    this->settings = &SettingManager::getInstance();
 }
 
 void StateController :: setup_rgbLED(void) {
