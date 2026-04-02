@@ -20,6 +20,7 @@ stateName BurstingState :: get_name(void) {
 // Set burst generator to active mode and turn on stimulation
 void BurstingState :: enter(StateController* ctrl) {
     ctrl->set_rgbLED(0, 0, 255); // blue
+    ctrl->waveGen->EnableOutput(true);
     ctrl->burstGen->disableStandbyMode();
     ctrl->report_bursting(true);
     this->pulseOn();
@@ -29,6 +30,7 @@ void BurstingState :: enter(StateController* ctrl) {
 void BurstingState :: exit(StateController* ctrl) {
     this->pulseOff();
     ctrl->burstGen->enableStandbyMode();
+    ctrl->waveGen->EnableOutput(false);
     ctrl->report_bursting(false);
 }
 
@@ -106,7 +108,7 @@ void BurstingState :: program_stim_timer(void) {
     // Initialize clock
     nrf_timer_frequency_set(NRF_TIMER1, prescaler);
     nrf_timer_mode_set(NRF_TIMER1, NRF_TIMER_MODE_TIMER);
-    nrf_timer_bit_width_set(NRF_TIMER1, NRF_TIMER_BIT_WIDTH_24);
+    nrf_timer_bit_width_set(NRF_TIMER1, NRF_TIMER_BIT_WIDTH_32);
     
     // Calculate compare register values for stim ON/OFF events
     uint32_t on_over  = nrf_timer_us_to_ticks(round(SettingManager::stim_pd * SettingManager::stim_dc / 100.0f), prescaler);
@@ -117,7 +119,7 @@ void BurstingState :: program_stim_timer(void) {
     nrf_timer_cc_set(NRF_TIMER1, stimOnClock, off_over);
 }
 
-// Create a low-frequency timer (TIMER2)to trigger timeout event
+// Create a low-frequency timer (TIMER2) to trigger timeout event
 void BurstingState :: program_timeout_timer(void) {
     // Calculate timer resolution
     nrf_timer_frequency_t prescaler = static_cast<nrf_timer_frequency_t>(constrain(ceil(log(16e6 * SettingManager::timeout / 1e3) / log(2) - 24), 0, 9));
@@ -125,7 +127,7 @@ void BurstingState :: program_timeout_timer(void) {
     // Initialize clock
     nrf_timer_frequency_set(NRF_TIMER2, prescaler);
     nrf_timer_mode_set(NRF_TIMER2, NRF_TIMER_MODE_TIMER);
-    nrf_timer_bit_width_set(NRF_TIMER2, NRF_TIMER_BIT_WIDTH_24);
+    nrf_timer_bit_width_set(NRF_TIMER2, NRF_TIMER_BIT_WIDTH_32);
 
     // Calculate compare register values for timeout event
     uint32_t timeout_over = nrf_timer_ms_to_ticks(round(SettingManager::timeout), prescaler);

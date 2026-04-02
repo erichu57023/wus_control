@@ -20,7 +20,7 @@ void AdvertisingState :: update(StateController* ctrl) {
         ctrl->devStatus = DEVICE_OK;
         ctrl->go_to_state(IDLE_STATE);
     }
-    Serial.println("Advertising!");
+    // Serial.println("Advertising!");
 }
 
 void AdvertisingState :: initialize(StateController* ctrl) {
