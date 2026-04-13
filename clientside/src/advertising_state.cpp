@@ -16,11 +16,7 @@ void AdvertisingState :: exit(StateController* ctrl) {
 }
 
 void AdvertisingState :: update(StateController* ctrl) {
-    if (ctrl->is_connected()) {
-        ctrl->devStatus = DEVICE_OK;
-        ctrl->go_to_state(IDLE_STATE);
-    }
-    // Serial.println("Advertising!");
+    sleep_CPU();
 }
 
 void AdvertisingState :: initialize(StateController* ctrl) {
@@ -125,12 +121,14 @@ void connect_callback(uint16_t conn_handle) {
     // Get the reference to current connection
     StateController* ctrl = &StateController::getInstance();
     ctrl->connection = conn_handle;
+    ctrl->devStatus = DEVICE_OK;
+    ctrl->go_to_state(IDLE_STATE);
 }
 
 void disconnect_callback(uint16_t conn_handle, uint8_t reason) {
     (void) conn_handle;
     (void) reason;
-
+    // Serial.println(reason, HEX); // 0x08 is a timeout
     StateController* ctrl = &StateController::getInstance();
     ctrl->devStatus = DEVICE_NO_CONNECT; 
     ctrl->go_to_state(ADVERTISING_STATE);

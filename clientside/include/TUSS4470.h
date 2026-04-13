@@ -16,7 +16,7 @@ typedef enum {LOW_CURRENT = 0, HIGH_CURRENT = 1} CurrentType;
 typedef enum {HIZ_OFF = 0, HIZ_ON = 1} HiZType;
 typedef enum {IO_MODE0 = 0, IO_MODE1 = 1, IO_MODE2 = 2, IO_MODE3 = 3} IOMode;
 typedef enum {PRE_DRV0 = 0, PRE_DRV1 = 1} PreDriverMode;
-typedef enum {STDBY_OFF = 0, STDBY_ON = 1} StandbyMode;
+typedef enum {STDBY_OFF = 0, STDBY_ON = 1, STDBY_SLEEP = 2} StandbyMode;
 
 #include "setting_manager.h"
 
@@ -51,6 +51,12 @@ class TUSS4470 {
 
     // Enables standby mode
     void enableStandbyMode();
+
+    // Disables sleep mode
+    void disableSleepMode();
+
+    // Enables sleep mode
+    void enableSleepMode();
     
     // Sets voltage, current, IO mode, and pulse count
     void set(uint8_t voltage, CurrentType current, IOMode mode, uint8_t pulse_count);

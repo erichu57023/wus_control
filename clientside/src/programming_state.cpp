@@ -46,7 +46,7 @@ void ProgrammingState :: startup_sequence(StateController* ctrl) {
     ctrl->burstGen = new TUSS4470(ctrl->settings->cs_tuss4470);
 
     ctrl->waveGen->Begin();
-    ctrl->waveGen->DisableDAC(true);
+    ctrl->waveGen->SleepMode(true);
     ctrl->waveGen->ApplySignal(SQUARE_WAVE, REG0, ctrl->settings->frequency);
 
     ctrl->burstGen->begin();
@@ -87,8 +87,8 @@ void ProgrammingState :: change_setting(StateController* ctrl) {
             break;
         
         case FREQ_CHG:
-            ctrl->settings->frequency = val;
-            ctrl->waveGen->SetFrequency(REG0, val);
+            ctrl->settings->frequency = valFloat;
+            ctrl->waveGen->SetFrequency(REG0, valFloat);
             break;
         
         case TOUT_CHG:

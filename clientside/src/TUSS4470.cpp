@@ -67,6 +67,15 @@ void TUSS4470 :: enableStandbyMode() {
   updateTOFConfigRegister();
 }
 
+void TUSS4470 :: disableSleepMode() {
+  disableStandbyMode();
+}
+
+void TUSS4470 :: enableSleepMode() {
+  _standbyMode = STDBY_SLEEP;
+  updateTOFConfigRegister();
+}
+
 void TUSS4470 :: set(uint8_t voltage, CurrentType current, IOMode mode, uint8_t pulse_count) {
   setVoltage(voltage);
   setCurrent(current);

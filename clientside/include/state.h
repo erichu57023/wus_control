@@ -10,6 +10,9 @@ class State {
         virtual void enter(StateController* ctrl) = 0;
         virtual void exit(StateController* ctrl) = 0;
         virtual void update(StateController* ctrl) = 0;
+        void sleep_CPU(void) {
+            delay(10000); // Calls vTaskDelay in FreeRTOS to sleep the CPU; can be interrupted
+        }
 };
 
 #endif

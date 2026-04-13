@@ -20,8 +20,13 @@ stateName BurstingState :: get_name(void) {
 // Set burst generator to active mode and turn on stimulation
 void BurstingState :: enter(StateController* ctrl) {
     ctrl->set_rgbLED(0, 0, 255); // blue
+    // TODO: enable/disable 25MHz clock
+    ctrl->waveGen->DisableInternalClock(false);
     ctrl->waveGen->EnableOutput(true);
-    ctrl->burstGen->disableStandbyMode();
+    ctrl->burstGen->disableSleepMode();
+    nrf_pwm_enable(NRF_PWM0);
+
+    delay(10);
     ctrl->report_bursting(true);
     this->pulseOn();
 }
@@ -29,13 +34,17 @@ void BurstingState :: enter(StateController* ctrl) {
 // Turn off stimulation and put burst generator in standby mode
 void BurstingState :: exit(StateController* ctrl) {
     this->pulseOff();
-    ctrl->burstGen->enableStandbyMode();
+    ctrl->burstGen->enableSleepMode();
     ctrl->waveGen->EnableOutput(false);
+    ctrl->waveGen->DisableInternalClock(true);
     ctrl->report_bursting(false);
+    nrf_pwm_disable(NRF_PWM0);
 }
 
 // Remain in bursting state until an interrupt triggers exit
-void BurstingState :: update(StateController* ctrl) {}
+void BurstingState :: update(StateController* ctrl) {
+    sleep_CPU();
+}
 
 // Turn on stimulation
 void BurstingState :: pulseOn(void) {
@@ -67,7 +76,8 @@ void BurstingState :: initialize(void) {
     // Set up burst pin for PWM output
     nrf_gpio_cfg_output(burstPin);      // Configure burst pin as output
     nrf_gpio_pin_set(burstPin);         // Set default pin value as high
-    nrf_pwm_enable(NRF_PWM0);
+    
+    // Set up PWM for stimulation control
     program_PWM();
     uint32_t output_pins[4] = {burstPin, NRF_PWM_PIN_NOT_CONNECTED, NRF_PWM_PIN_NOT_CONNECTED, NRF_PWM_PIN_NOT_CONNECTED};
     nrf_pwm_pins_set(NRF_PWM0, output_pins);
@@ -171,7 +181,7 @@ void BurstingState :: program_event_hooks(void) {
 /*  Set up a constant duty cycle PWM output. */
 void BurstingState :: program_simple_PWM(void) {
     // Calculate PWM register values
-    float countTop = 16e6 * SettingManager::burst_pd;
+    float countTop = 16.0f * SettingManager::burst_pd;
     uint8_t prescaler = 0;
     while (countTop > 0x7fff && prescaler < 7) { // countTop is a 15-bit register
         prescaler++;
@@ -204,7 +214,7 @@ void BurstingState :: program_simple_PWM(void) {
     with a delay for the pulse OFF time. The sequence must end with 0.  */
 void BurstingState :: program_arbitrary_PWM(void) {
     // Calculate PWM register values
-    float countTop = round(16e6f * SettingManager::burst_pd * SettingManager::burst_dc / 100.0f
+    float countTop = round(16.0f * SettingManager::burst_pd * SettingManager::burst_dc / 100.0f
                               / SettingManager::dc_seq_len / (centeredPWM + 1));
     uint8_t prescaler = 0;
     while (countTop > 0x7fff && prescaler < 7) { // countTop is a 15-bit register
@@ -215,7 +225,7 @@ void BurstingState :: program_arbitrary_PWM(void) {
 
     // NEEDS to be static (not stored on the stack)
     for (unsigned int i = 0; i < SettingManager::dc_seq_len; i++) {
-        compareSeq[i] = round(SettingManager::dc_seq_vals[i] / 255.0f * countTop);
+        compareSeq[i] = round((float) SettingManager::dc_seq_vals[i] / 255.0f * countTop);
         compareSeq[i] |= 0x8000; // Set MSB to enable output inversion (active low)
     } 
     uint32_t off_time_loops = round(SettingManager::dc_seq_len * (100.0f / SettingManager::burst_dc - 1.0f));

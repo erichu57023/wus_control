@@ -11,4 +11,6 @@ void IdleState :: enter(StateController* ctrl) {
 
 void IdleState :: exit(StateController* ctrl) {}
 
-void IdleState :: update(StateController* ctrl) {}
+void IdleState :: update(StateController* ctrl) {
+    sleep_CPU();
+}
